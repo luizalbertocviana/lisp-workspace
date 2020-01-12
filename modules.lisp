@@ -6,6 +6,7 @@
   "loads a fasl for each of the corresponding file-name files, if not
    already loaded, during situation time. This also updates fasl files
    as needed. Situation must be :compiling or :loading"
+  ;; chooses values according to situation
   (let ((situation-toplevel (case situation
                               (:compiling :compile-toplevel)
                               (:loading   :load-toplevel)))
@@ -18,13 +19,20 @@
                                    (abs-pathname-lisp (gensym))
                                    (fn-fasl           (format nil "~a.fasl" fn))
                                    (fn-lisp           (format nil "~a.lisp" fn)))
+                               ;; creates absolute paths for both fasl
+                               ;; and lisp files, based on current
+                               ;; file being compiled/loaded
                                `(let ((,abs-pathname-fasl (merge-pathnames ,fn-fasl ,situation-truename))
                                       (,abs-pathname-lisp (merge-pathnames ,fn-lisp ,situation-truename)))
+                                  ;; if fasl absolute path is not
+                                  ;; registered yet
                                   (unless (member ,abs-pathname-fasl *user-modules* :test #'equal)
+                                    ;; ensure fasl file exists and is up-to-date
                                     (unless (and (probe-file ,abs-pathname-fasl)
                                                  (>= (file-write-date ,abs-pathname-fasl)
                                                      (file-write-date ,abs-pathname-lisp)))
                                       (compile-file ,abs-pathname-lisp))
+                                    ;; load and register fasl file
                                     (load ,abs-pathname-fasl :verbose t)
                                     (push ,abs-pathname-fasl *user-modules*)))))))))
 
@@ -33,5 +41,7 @@
    already loaded, during both loading and compilation time. This also
    updates fasl files as needed"
   `(progn
+     ;; prepares to load modules during both compilation and loading
+     ;; times
      (using-when :compiling ,@file-names)
      (using-when :loading   ,@file-names)))
