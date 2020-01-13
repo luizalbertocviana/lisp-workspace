@@ -48,3 +48,9 @@
                      p
                      `(,p ,x))))
         `(lambda (,x) ,(maptree #'transform expr))))))
+
+(defmacro aif (condition then &optional else)
+  "anaphoric macro that binds condition value to variable it, which
+   can be referenced in both then and else expressions"
+  `(let ((it ,condition))
+     (if it ,then ,else)))
