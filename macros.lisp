@@ -41,7 +41,7 @@
 
 (defmacro compose-predicates (expr)
   "builds a function where every symbol in expr other than 'and and 'or is turned into a proper function call"
-  (let ((logical-operators '(and or)))
+  (let ((logical-operators '(and or not)))
     (with-gensyms (x)
       (labels ((transform (p)
                  (if (member p logical-operators)
