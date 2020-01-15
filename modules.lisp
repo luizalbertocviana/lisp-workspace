@@ -29,7 +29,7 @@
                               ;; creates absolute paths for both fasl
                               ;; and lisp files, based on current
                               ;; file being compiled/loaded
-                              `(let ((,fasl-membership-test (member ,abs-pathname-fasl *user-modules* :test #'equal))
+                              `(let ((,fasl-membership-test (loaded ,abs-pathname-fasl))
                                      (,fasl-updated-test    (and (probe-file ,abs-pathname-fasl)
                                                                  (>= (file-write-date ,abs-pathname-fasl)
                                                                      (file-write-date ,abs-pathname-lisp)))))
@@ -63,5 +63,5 @@
   (let* ((name-fasl         (format nil "~a.fasl" name))
          (abs-pathname-fasl (merge-pathnames name-fasl *base-path*)))
     `(eval-when (:load-toplevel)
-       (unless (member ,abs-pathname-fasl *user-modules* :test #'equal)
+       (unless (loaded ,abs-pathname-fasl)
          (push ,abs-pathname-fasl *user-modules*)))))
