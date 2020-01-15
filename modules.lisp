@@ -52,7 +52,7 @@
                                    (load ,abs-pathname-fasl :verbose t)
                                    ;; register module is loaded
                                    (unless ,fasl-membership-test
-                                     (push ,abs-pathname-fasl *user-modules*)))))))))
+                                     (register ,abs-pathname-fasl)))))))))
 
 (defmacro using (&rest file-names)
   "loads a fasl for each of the corresponding file-names files, if not
@@ -72,4 +72,4 @@
          (abs-pathname-fasl (abs-base-path name-fasl)))
     `(eval-when (:load-toplevel)
        (unless (loaded ,abs-pathname-fasl)
-         (push ,abs-pathname-fasl *user-modules*)))))
+         (register ,abs-pathname-fasl)))))
