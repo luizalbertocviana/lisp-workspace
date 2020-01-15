@@ -50,10 +50,7 @@
                                    (unless ,fasl-updated-test
                                      (compile-file ,abs-pathname-lisp))
                                    ;; load module
-                                   (load ,abs-pathname-fasl :verbose t)
-                                   ;; register module is loaded
-                                   (unless ,fasl-membership-test
-                                     (register ,abs-pathname-fasl)))))))))
+                                   (load ,abs-pathname-fasl :verbose t))))))))
 
 (defmacro using (&rest file-names)
   "loads a fasl for each of the corresponding file-names files, if not
