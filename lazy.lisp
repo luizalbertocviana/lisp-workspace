@@ -24,3 +24,5 @@
          (with-expressions (,@(loop for var in variables and gvar in gvariables
                                      collect `(,var (force ,gvar))))
            ,@body)))))
+
+(module "lazy")
