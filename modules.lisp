@@ -2,6 +2,10 @@
   "list of currently loaded user modules. This variable identifies
    modules by absolute path")
 
+(defun register (name)
+  "add name to *user-modules*. Name must be an fasl absolute path"
+  (push name *user-modules*))
+
 (defparameter *base-path* #.(or *compile-file-truename* *load-truename*)
   "absolute path of modules.lisp file. This is used as the root of the
    project. This way, you should put modules.lisp at the root of your
