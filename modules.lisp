@@ -12,7 +12,6 @@
    already loaded or outdated, during situation time. This also
    updates fasl files as needed. Situation must be :compiling or
    :loading"
-  ;; chooses values according to situation
   `(eval-when (,situation)
      (progn ,@(loop for fn in file-names
                     collect (let ((fn-fasl              (format nil "~a.fasl" fn))
