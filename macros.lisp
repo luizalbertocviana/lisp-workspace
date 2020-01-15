@@ -54,3 +54,5 @@
    can be referenced in both then and else expressions"
   `(let ((it ,condition))
      (if it ,then ,else)))
+
+(module "macros")
