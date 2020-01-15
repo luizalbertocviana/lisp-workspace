@@ -3,7 +3,8 @@
    modules by absolute path")
 
 (defun register (name)
-  "add name to *user-modules*. Name must be an fasl absolute path"
+  "add name to *user-modules*. Name must be an fasl absolute
+   path. Intended for internal use"
   (push name *user-modules*))
 
 (defparameter *base-path* #.(or *compile-file-truename* *load-truename*)
