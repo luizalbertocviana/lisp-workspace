@@ -14,21 +14,19 @@
    :loading"
   `(eval-when (,situation)
      (progn ,@(loop for fn in file-names
-                    collect (let ((fn-fasl              (format nil "~a.fasl" fn))
-                                  (fn-lisp              (format nil "~a.lisp" fn))
-                                  (abs-pathname-fasl    (gensym))
-                                  (abs-pathname-lisp    (gensym))
-                                  (fasl-membership-test (gensym))
-                                  (fasl-updated-test    (gensym)))
+                    collect (let* ((fn-fasl              (format nil "~a.fasl" fn))
+                                   (fn-lisp              (format nil "~a.lisp" fn))
+                                   (abs-pathname-fasl    (merge-pathnames fn-fasl *base-path*))
+                                   (abs-pathname-lisp    (merge-pathnames fn-lisp *base-path*))
+                                   (fasl-membership-test (gensym))
+                                   (fasl-updated-test    (gensym)))
                               ;; creates absolute paths for both fasl
                               ;; and lisp files, based on current
                               ;; file being compiled/loaded
-                              `(let* ((,abs-pathname-fasl    (merge-pathnames ,fn-fasl *base-path*))
-                                      (,abs-pathname-lisp    (merge-pathnames ,fn-lisp *base-path*))
-                                      (,fasl-membership-test (member ,abs-pathname-fasl *user-modules* :test #'equal))
-                                      (,fasl-updated-test    (and (probe-file ,abs-pathname-fasl)
-                                                                  (>= (file-write-date ,abs-pathname-fasl)
-                                                                      (file-write-date ,abs-pathname-lisp)))))
+                              `(let ((,fasl-membership-test (member ,abs-pathname-fasl *user-modules* :test #'equal))
+                                     (,fasl-updated-test    (and (probe-file ,abs-pathname-fasl)
+                                                                 (>= (file-write-date ,abs-pathname-fasl)
+                                                                     (file-write-date ,abs-pathname-lisp)))))
                                  ;; if module is not loaded or is
                                  ;; outdated
                                  (unless (and ,fasl-membership-test ,fasl-updated-test)
