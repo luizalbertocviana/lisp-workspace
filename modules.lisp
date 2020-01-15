@@ -7,6 +7,10 @@
    project. This way, you should put modules.lisp at the root of your
    project so you can properly use these macros")
 
+(defun abs-base-path (name)
+  "returns absolute path of name based on *base-path*"
+  (merge-pathnames name *base-path*))
+
 (defun loaded (name)
   "returns t iff name is a member of *base-path* (module is
    loaded). Name should be a fasl absolute path. This is intended for
