@@ -7,6 +7,12 @@
    project. This way, you should put modules.lisp at the root of your
    project so you can properly use these macros")
 
+(defun loaded (name)
+  "returns t iff name is a member of *base-path* (module is
+   loaded). Name should be a fasl absolute path. This is intended for
+   internal use"
+  (member name *user-modules* :test #'equal))
+
 (defmacro using-when (situation &rest file-names)
   "loads a fasl for each of the corresponding file-name files, if not
    already loaded or outdated, during situation time. This also
