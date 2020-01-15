@@ -26,8 +26,8 @@
      (progn ,@(loop for fn in file-names
                     collect (let* ((fn-fasl              (format nil "~a.fasl" fn))
                                    (fn-lisp              (format nil "~a.lisp" fn))
-                                   (abs-pathname-fasl    (merge-pathnames fn-fasl *base-path*))
-                                   (abs-pathname-lisp    (merge-pathnames fn-lisp *base-path*))
+                                   (abs-pathname-fasl    (abs-base-path fn-fasl))
+                                   (abs-pathname-lisp    (abs-base-path fn-lisp))
                                    (fasl-membership-test (gensym))
                                    (fasl-updated-test    (gensym)))
                               ;; creates absolute paths for both fasl
@@ -65,7 +65,7 @@
    the end of a file, so it only registers it if loading was
    successful"
   (let* ((name-fasl         (format nil "~a.fasl" name))
-         (abs-pathname-fasl (merge-pathnames name-fasl *base-path*)))
+         (abs-pathname-fasl (abs-base-path name-fasl)))
     `(eval-when (:load-toplevel)
        (unless (loaded ,abs-pathname-fasl)
          (push ,abs-pathname-fasl *user-modules*)))))
