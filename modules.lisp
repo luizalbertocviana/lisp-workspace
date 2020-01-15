@@ -51,3 +51,13 @@
      ;; times
      (using-when :compile-toplevel ,@file-names)
      (using-when :load-toplevel    ,@file-names)))
+
+(defmacro module (name)
+  "registers module in *user-modules*. This macro should be used at
+   the end of a file, so it only registers it if loading was
+   successful"
+  (let* ((name-fasl         (format nil "~a.fasl" name))
+         (abs-pathname-fasl (merge-pathnames name-fasl *base-path*)))
+    `(eval-when (:load-toplevel)
+       (unless (member ,abs-pathname-fasl *user-modules* :test #'equal)
+         (push ,abs-pathname-fasl *user-modules*)))))
