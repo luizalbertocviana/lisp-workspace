@@ -2,6 +2,11 @@
   "list of currently loaded user modules. This variable identifies
    modules by absolute path")
 
+(defparameter *base-path* #.(or *compile-file-truename* *load-truename*)
+  "absolute path of modules.lisp file. This is used as the root of the
+   project. This way, you should put modules.lisp at the root of your
+   project so you can properly use these macros")
+
 (defmacro using-when (situation &rest file-names)
   "loads a fasl for each of the corresponding file-name files, if not
    already loaded or outdated, during situation time. This also
