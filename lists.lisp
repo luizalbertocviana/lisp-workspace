@@ -12,3 +12,5 @@
         ((consp tree)
          (let ((first (car tree)) (second (cdr tree)))
            (cons (maptree f first) (maptree f second))))))
+
+(module "lists")
