@@ -2,10 +2,34 @@
   "list of currently loaded user modules. This variable identifies
    modules by absolute path")
 
+(defun loaded (name)
+  "returns t iff name is a member of *base-path* (module is
+   loaded). Name should be a fasl absolute path. This is intended for
+   internal use"
+  (member name *user-modules* :test #'equal))
+
 (defun register (name)
   "add name to *user-modules*. Name must be an fasl absolute
    path. Intended for internal use"
   (push name *user-modules*))
+
+(defvar *compilation-depth* 0
+  "this variable indicates in which direction modules are being
+   compiled. If a top-down compilation is taking place, this variable
+   should be positive; if a bottom-up compilation is happenning, its
+   value should be negative; if no compilation is in course, its value
+   is zero")
+
+(defun bottom-up-compilation ()
+  "returns t iff *compilation-depth* is negative"
+  (minusp *compilation-depth*))
+
+(defun top-down-compilation ()
+  "returns t iff *compilation-depth* is positive"
+  (plusp *compilation-depth*))
+
+(defun no-compilation ()
+  (zerop *compilation-depth*))
 
 (defparameter *base-path* #.(or *compile-file-truename* *load-truename*)
   "absolute path of modules.lisp file. This is used as the root of the
@@ -15,12 +39,6 @@
 (defun abs-base-path (name)
   "returns absolute path of name based on *base-path*"
   (merge-pathnames name *base-path*))
-
-(defun loaded (name)
-  "returns t iff name is a member of *base-path* (module is
-   loaded). Name should be a fasl absolute path. This is intended for
-   internal use"
-  (member name *user-modules* :test #'equal))
 
 (defmacro using-when (situation &rest file-names)
   "loads a fasl for each of the corresponding file-name files, if not
@@ -48,7 +66,10 @@
                                    ;; update module in case it is
                                    ;; outdated
                                    (unless ,fasl-updated-test
-                                     (compile-file ,abs-pathname-lisp))
+                                     (incf *compilation-depth*)
+                                     (unwind-protect
+                                          (compile-file ,abs-pathname-lisp)
+                                       (decf *compilation-depth*)))
                                    ;; load module
                                    (load ,abs-pathname-fasl :verbose t))))))))
 
