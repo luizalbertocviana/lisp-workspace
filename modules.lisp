@@ -114,3 +114,12 @@
                                    (incf *compilation-depth*))
                                  (when (loaded ,abs-pathname-fasl)
                                    (load ,abs-pathname-fasl :verbose t))))))))
+
+(defmacro defmodule ((name &key (using nil) (used-by nil)) &body body)
+  "documentation string"
+  `(progn
+     (using-when :compile-toplevel ,@using)
+     (using-when :load-toplevel    ,@using)
+     ,@body
+     (module ,name)
+     (used-by ,@used-by)))
