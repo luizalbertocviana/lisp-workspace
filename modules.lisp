@@ -65,7 +65,7 @@
                                  (unless (and ,fasl-membership-test ,fasl-updated-test)
                                    ;; update module in case it is
                                    ;; outdated
-                                   (unless (and ,fasl-updated-test (bottom-up-compilation))
+                                   (unless (or ,fasl-updated-test (bottom-up-compilation))
                                      (incf *compilation-depth*)
                                      (unwind-protect
                                           (compile-file ,abs-pathname-lisp)
@@ -92,3 +92,18 @@
     `(eval-when (:load-toplevel)
        (unless (loaded ,abs-pathname-fasl)
          (register ,abs-pathname-fasl)))))
+
+(defmacro used-by (&rest file-names)
+  "this macro should be used as the last form in a file. After the
+   other forms of a file containing this macro are compiled, each of
+   file-names lisp files is compiled as well. Useful for updating
+   macro applications"
+  `(eval-when (:compile-toplevel)
+     (progn ,@(loop for fn in file-names
+                    collect (let* ((fn-lisp           (format nil "~a.lisp" fn))
+                                   (abs-pathname-lisp (abs-base-path fn-lisp)))
+                              `(unless (top-down-compilation)
+                                 (decf *compilation-depth*)
+                                 (unwind-protect
+                                      (compile-file ,abs-pathname-lisp)
+                                   (incf *compilation-depth*))))))))
