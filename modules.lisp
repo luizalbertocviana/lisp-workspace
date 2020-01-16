@@ -64,7 +64,8 @@
                                  ;; outdated
                                  (unless (and ,fasl-membership-test ,fasl-updated-test)
                                    ;; update module in case it is
-                                   ;; outdated
+                                   ;; outdated and no bottom-up
+                                   ;; compilation is taking place
                                    (unless (or ,fasl-updated-test (bottom-up-compilation))
                                      (incf *compilation-depth*)
                                      (unwind-protect
@@ -101,9 +102,13 @@
   `(eval-when (:compile-toplevel)
      (progn ,@(loop for fn in file-names
                     collect (let* ((fn-lisp           (format nil "~a.lisp" fn))
-                                   (abs-pathname-lisp (abs-base-path fn-lisp)))
+                                   (fn-fasl           (format nil "~a.fasl" fn))
+                                   (abs-pathname-lisp (abs-base-path fn-lisp))
+                                   (abs-pathname-fasl (abs-base-path fn-fasl)))
                               `(unless (top-down-compilation)
                                  (decf *compilation-depth*)
                                  (unwind-protect
                                       (compile-file ,abs-pathname-lisp)
-                                   (incf *compilation-depth*))))))))
+                                   (incf *compilation-depth*))
+                                 (when (loaded ,abs-pathname-fasl)
+                                   (load ,abs-pathname-fasl))))))))
