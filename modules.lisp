@@ -65,7 +65,7 @@
                                  (unless (and ,fasl-membership-test ,fasl-updated-test)
                                    ;; update module in case it is
                                    ;; outdated
-                                   (unless ,fasl-updated-test
+                                   (unless (and ,fasl-updated-test (bottom-up-compilation))
                                      (incf *compilation-depth*)
                                      (unwind-protect
                                           (compile-file ,abs-pathname-lisp)
