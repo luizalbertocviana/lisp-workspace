@@ -60,19 +60,21 @@
                                      (,fasl-updated-test    (and (probe-file ,abs-pathname-fasl)
                                                                  (>= (file-write-date ,abs-pathname-fasl)
                                                                      (file-write-date ,abs-pathname-lisp)))))
-                                 ;; if module is not loaded or is
-                                 ;; outdated
-                                 (unless (and ,fasl-membership-test ,fasl-updated-test)
-                                   ;; update module in case it is
-                                   ;; outdated and no bottom-up
-                                   ;; compilation is taking place
-                                   (unless (or ,fasl-updated-test (bottom-up-compilation))
-                                     (incf *compilation-depth*)
-                                     (unwind-protect
-                                          (compile-file ,abs-pathname-lisp)
-                                       (decf *compilation-depth*)))
-                                   ;; load module
-                                   (load ,abs-pathname-fasl :verbose t))))))))
+                                 ;; if no bottom-up compilation is
+                                 ;; taking place
+                                 (unless (bottom-up-compilation)
+                                   ;; if not loaded or needs update
+                                   (unless (and ,fasl-membership-test ,fasl-updated-test)
+                                     ;; update module in case it is
+                                     ;; outdated and no bottom-up
+                                     ;; compilation is taking place
+                                     (unless ,fasl-updated-test
+                                       (incf *compilation-depth*)
+                                       (unwind-protect
+                                            (compile-file ,abs-pathname-lisp)
+                                         (decf *compilation-depth*)))
+                                     ;; load module
+                                     (load ,abs-pathname-fasl :verbose t)))))))))
 
 (defmacro using (&rest file-names)
   "loads a fasl for each of the corresponding file-names files, if not
@@ -111,4 +113,4 @@
                                       (compile-file ,abs-pathname-lisp)
                                    (incf *compilation-depth*))
                                  (when (loaded ,abs-pathname-fasl)
-                                   (load ,abs-pathname-fasl))))))))
+                                   (load ,abs-pathname-fasl :verbose t))))))))
