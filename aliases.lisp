@@ -1,7 +1,8 @@
-(using "macros")
+(defmodule ("aliases"
+            :using   ("macros")
+            :used-by ("lazy"))
 
-(aliases
-  with-expressions symbol-macrolet
-  keep-if          remove-if-not)
+  (alias with-expressions symbol-macrolet)
+  (alias keep-if          remove-if-not))
 
-(module "aliases")
+
