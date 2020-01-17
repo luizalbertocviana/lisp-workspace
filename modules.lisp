@@ -87,8 +87,8 @@
      (using-when :load-toplevel    ,@file-names)))
 
 (defmacro module (name)
-  "registers module in *user-modules*. This macro should be used at
-   the end of a file, so it only registers it if loading was
+  "registers module in *user-modules*. This macro should be used after
+   all the user forms, so it only registers the module if loading was
    successful"
   (let* ((name-fasl         (format nil "~a.fasl" name))
          (abs-pathname-fasl (abs-base-path name-fasl)))
@@ -97,10 +97,10 @@
          (register ,abs-pathname-fasl)))))
 
 (defmacro used-by (&rest file-names)
-  "this macro should be used as the last form in a file. After the
-   other forms of a file containing this macro are compiled, each of
-   file-names lisp files is compiled as well. Useful for updating
-   macro applications"
+  "this macro should be used as the last form in a file, after module
+   macro. After the other forms of a file containing this macro are
+   compiled, each of file-names lisp files is compiled as well. Useful
+   for updating macro applications"
   `(eval-when (:compile-toplevel)
      (progn ,@(loop for fn in file-names
                     collect (let* ((fn-lisp           (format nil "~a.lisp" fn))
