@@ -117,7 +117,7 @@
 
 (defmacro defmodule ((name &key (using nil) (used-by nil)) &body body)
   "this macro should be used as the only toplevel form in a file. It
-   defines the concept of a module, that is, a file that may depend of
+   defines the concept of a module, that is, a file that may depend on
    others to properly load or compile. This defines module NAME (must
    be lisp filename with no extension) containing BODY forms, whose
    compilation and loading depends on USING files. Also, whenever NAME
