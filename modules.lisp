@@ -1,3 +1,10 @@
+(defpackage :modules
+  (:use :common-lisp)
+  (:export
+   :using :module :used-by))
+
+(in-package :modules)
+
 (defvar *user-modules* nil
   "list of currently loaded user modules. This variable identifies
    modules by absolute path")
