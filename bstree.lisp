@@ -35,11 +35,11 @@
 (defmacro recurse-into (func child)
   "makes func recurse into node child.  If child is nil, returns node key val pair"
   `(when node
-    (with-node node
-        (key val left right)
-      (if ,child
-          (,func ,child)
-          (cons key val)))))
+     (with-node node
+         (key val left right)
+       (if ,child
+           (,func ,child)
+           (cons key val)))))
 
 (defun max-key (node)
   "returns key val pair whose key is maximum"
