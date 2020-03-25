@@ -3,7 +3,7 @@
 (defpackage :bstree
   (:use :common-lisp :aliases)
   (:export
-     :compare :lookup :insert))
+     :compare :lookup :insert :max-key :min-key))
 
 (in-package :bstree)
 
@@ -32,15 +32,32 @@
         (,right (getf ,node :right)))
      ,@body))
 
+(defmacro recurse-into (func child)
+  "makes func recurse into node child.  If child is nil, returns node key val pair"
+  `(when node
+    (with-node node
+        (key val left right)
+      (if ,child
+          (,func ,child)
+          (cons key val)))))
+
+(defun max-key (node)
+  "returns key val pair whose key is maximum"
+  (recurse-into max-key right))
+
+(defun min-key (node)
+  "returns key val pair whose key is minimum"
+  (recurse-into min-key left))
+
 (defun lookup (node key)
   "searches for key in bstree rooted at node, returning corresponding val (or nil, in case key is not present)"
   (when node
     (with-node node
-        (node-key node-val node-left node-right)
+        (node-key val left right)
       (case (compare key node-key)
-        (:less    (lookup node-left key))
-        (:equal   node-val)
-        (:greater (lookup node-right key))))))
+        (:less    (lookup left key))
+        (:equal   val)
+        (:greater (lookup right key))))))
 
 (defun insert (node key val)
   "inserts key val pair in bstree rooted at node in case key is not present yet"
