@@ -3,7 +3,9 @@
 (defpackage :bstree
   (:use :common-lisp :aliases)
   (:export
-     :compare :lookup :insert :max-key :min-key))
+     :compare
+     :lookup :insert :update
+     :max-key :min-key))
 
 (in-package :bstree)
 
@@ -69,5 +71,15 @@
           (:equal   node)
           (:greater (make-bstree node-key node-val left (insert right key val)))))
       (make-leaf key val)))
+
+(defun update (node key new-val)
+  "updates key to be attached to new-val, in case key is present in node"
+  (when node
+    (with-node node
+        (node-key node-val left right)
+      (case (compare key node-key)
+        (:less    (make-bstree node-key node-val (update left key new-val) right))
+        (:equal   (make-bstree node-key new-val left right))
+        (:greater (make-bstree node-key node-val left (update right key new-val)))))))
 
 (modules:module "bstree")
