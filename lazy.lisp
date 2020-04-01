@@ -2,33 +2,77 @@
 
 (defpackage :lazy
   (:use :common-lisp :aliases :macros)
-  (:shadow :let :cons :car :cdr)
+  (:shadow
+     :let :cons :car :cdr :mapcar
+     :length)
   (:export
-     :thunk :force :let :cons :car :cdr))
+     :thunk :delay :force :forcef
+     :let
+     :cons :car :cdr :length
+     :force-cons :force-list
+     :repeat :mapcar :take))
 
 (in-package :lazy)
 
-(defmacro thunk (&body body)
-  "creates a plist containing the code to be evaluated and the result of its evaluation"
-  ``(:result nil :code ,(fn0 ,@body)))
+(eval-when (:compile-toplevel :load-toplevel)
+  (defstruct (thunk)
+    "represents a possibly suspended computation"
+    code result))
 
-(defun force (thunk)
-  "force the evaluation of thunk. If already evaluated, just return the result"
-  (with-expressions ((code   (getf thunk :code))
-                     (result (getf thunk :result)))
-    (when code
-      (setf result (funcall code))
-      (setf code nil))
-    result))
+;; pretty-printing thunks
+(defmethod print-object ((thk thunk) out)
+  (print-unreadable-object (thk out :type t)
+    (format out "~a " (if (null (thunk-code thk))
+                         (thunk-result thk)
+                         "_"))))
+
+(defmacro delay (&body body)
+  "creates a struct containing the code to be evaluated and a place to put its evaluation"
+  (cl:let ((fn `(fn0 ,@body)))
+    `(make-thunk :code ,fn)))
+
+(eval-when (:compile-toplevel :load-toplevel)
+  (defun force (thing)
+    "forces the evaluation of thing. If already evaluated, just returns the result"
+    (if (thunk-p thing)
+        (with-expressions ((code   (thunk-code thing))
+                           (result (thunk-result thing)))
+          (when code
+            (setf result (funcall code))
+            (setf code nil))
+          result)
+        thing)))
+
+(defmacro forcef (place)
+  "if place contains a thunk, sets place with thunk result"
+  `(setf ,place (force ,place)))
+
+(defun car (c)
+  "thunk-aware version of car"
+  (forcef (cl:car c)))
+
+(defun cdr (c)
+  "thunk-aware version of cdr"
+  (forcef (cl:cdr c)))
+
+(defun force-cons (c)
+  "calls car and cdr on c, thus forcing its evaluation"
+  (car c) (cdr c) c)
+
+(defun force-list (list)
+  "forces evaluation of entire list"
+  (when (consp list)
+    (force-cons list)
+    (force-list (cdr list))))
 
 (defmacro let ((&rest bindings) &body body)
   "creates bindings using implicit thunks"
-  (cl:let ((variables (mapcar #'first bindings))
-        (values    (mapcar #'second bindings)))
+  (cl:let ((variables (cl:mapcar #'first bindings))
+           (values    (cl:mapcar #'second bindings)))
     (cl:let ((gvariables (loop for var in variables
-                            collect (gensym))))
+                               collect (gensym))))
       `(cl:let (,@(loop for gvar in gvariables and val in values
-                     collect `(,gvar (thunk ,val))))
+                        collect `(,gvar (delay ,val))))
          (with-expressions (,@(loop for var in variables and gvar in gvariables
                                     collect `(,var (force ,gvar))))
            ,@body)))))
@@ -36,24 +80,36 @@
 (defmacro lazily (func &rest args)
   "calls func with each arg inside of a thunk"
   `(,func ,@(loop for arg in args
-                  collect `(thunk ,arg))))
+                  collect `(delay ,arg))))
 
 (defmacro cons (a b)
   "creates a cons with both components inside thunks"
   `(lazily cl:cons ,a ,b))
 
+(defun length (list)
+  "returns number of elements in list"
+  (labels ((f (lst acc)
+             (if (consp lst)
+                 (f (cdr lst) (1+ acc))
+                 acc)))
+    (f list 0)))
+
 (defun repeat (a)
   "creates an infinite list with each element being a"
   (cons a (repeat a)))
 
-(defmacro defforce (force-fn fn)
-  "creates a thunk-aware version of fn"
-  (let ((doc-string (documentation fn 'function)))
-    `(defun ,force-fn (&rest args)
-       ,doc-string
-       (force (apply #',fn args)))))
+(defun take (n list)
+  "returns prefix of list containing the n first elements"
+  (when (and (plusp n)
+             (consp list))
+    (cons (car list) (take (1- n) (cdr list)))))
 
-(defforce car cl:car)
-(defforce cdr cl:cdr)
+(defun mapcar (fn list &rest lists)
+  "applies fn to corresponding elements of list and lists, returning results as a list"
+  (let ((head  (car list))
+        (heads (cl:mapcar #'car lists))
+        (tail  (cdr list))
+        (tails (cl:mapcar #'cdr lists)))
+    (cons (apply fn head heads) (apply #'mapcar fn tail tails))))
 
 (modules:module "lazy")
