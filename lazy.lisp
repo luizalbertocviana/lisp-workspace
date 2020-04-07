@@ -8,9 +8,10 @@
   (:export
      :thunk :delay :force :forcef
      :let
-     :cons :car :cdr :length
+     :cons :car :cdr
+     :length :take :drop
      :force-cons :force-list
-     :repeat :mapcar :take))
+     :repeat :mapcar))
 
 (in-package :lazy)
 
@@ -23,8 +24,8 @@
 (defmethod print-object ((thk thunk) out)
   (print-unreadable-object (thk out :type t)
     (format out "~a " (if (null (thunk-code thk))
-                         (thunk-result thk)
-                         "_"))))
+                          (thunk-result thk)
+                          "_"))))
 
 (defmacro delay (&body body)
   "creates a struct containing the code to be evaluated and a place to put its evaluation"
@@ -35,7 +36,7 @@
   (defun force (thing)
     "forces the evaluation of thing. If already evaluated, just returns the result"
     (if (thunk-p thing)
-        (with-expressions ((code   (thunk-code thing))
+        (with-expressions ((code   (thunk-code   thing))
                            (result (thunk-result thing)))
           (when code
             (setf result (funcall code))
@@ -65,18 +66,6 @@
     (force-cons list)
     (force-list (cdr list))))
 
-(defmacro let ((&rest bindings) &body body)
-  "creates bindings using implicit thunks"
-  (cl:let ((variables (cl:mapcar #'first bindings))
-           (values    (cl:mapcar #'second bindings)))
-    (cl:let ((gvariables (loop for var in variables
-                               collect (gensym))))
-      `(cl:let (,@(loop for gvar in gvariables and val in values
-                        collect `(,gvar (delay ,val))))
-         (with-expressions (,@(loop for var in variables and gvar in gvariables
-                                    collect `(,var (force ,gvar))))
-           ,@body)))))
-
 (defmacro lazily (func &rest args)
   "calls func with each arg inside of a thunk"
   `(,func ,@(loop for arg in args
@@ -99,10 +88,29 @@
   (cons a (repeat a)))
 
 (defun take (n list)
-  "returns prefix of list containing the n first elements"
+  "returns prefix of list containing the first n elements"
   (when (and (plusp n)
              (consp list))
     (cons (car list) (take (1- n) (cdr list)))))
+
+(defun drop (n list)
+  "returns suffix of list containing all but the first n elements"
+  (if (and (plusp n)
+           (consp list))
+      (drop (1- n) (cdr list))
+      list))
+
+(defmacro let ((&rest bindings) &body body)
+  "creates bindings using implicit thunks"
+  (cl:let ((variables (cl:mapcar #'first bindings))
+           (values    (cl:mapcar #'second bindings)))
+    (cl:let ((gvariables (loop for var in variables
+                               collect (gensym))))
+      `(cl:let (,@(loop for gvar in gvariables and val in values
+                        collect `(,gvar (delay ,val))))
+         (with-expressions (,@(loop for var in variables and gvar in gvariables
+                                    collect `(,var (force ,gvar))))
+           ,@body)))))
 
 (defun mapcar (fn list &rest lists)
   "applies fn to corresponding elements of list and lists, returning results as a list"
