@@ -3,15 +3,16 @@
 (defpackage :lazy
   (:use :common-lisp :aliases :macros)
   (:shadow
-     :let :cons :car :cdr :mapcar
+     :let :cons :car :cdr :mapcar :keep-if
      :length)
   (:export
      :thunk :delay :force :forcef
      :let
      :cons :car :cdr
      :length :take :drop
+     :take-while :drop-while :keep-if
      :force-cons :force-list
-     :repeat :mapcar))
+     :repeat :mapcar :iterate))
 
 (in-package :lazy)
 
@@ -87,6 +88,10 @@
   "creates an infinite list with each element being a"
   (cons a (repeat a)))
 
+(defun iterate (f a)
+  "returns successive applications of f over a"
+  (cons a (iterate f (funcall f a))))
+
 (defun take (n list)
   "returns prefix of list containing the first n elements"
   (when (and (plusp n)
@@ -99,6 +104,27 @@
            (consp list))
       (drop (1- n) (cdr list))
       list))
+
+(defun take-while (p list)
+  "takes elements from list while p is true"
+  (cl:let ((head (car list)))
+    (if (funcall p head)
+        (cons head (take-while p (cdr list)))
+        nil)))
+
+(defun drop-while (p list)
+  "drops elements from list while p is true"
+  (if (funcall p (car list))
+      (drop-while p (cdr list))
+      list))
+
+(defun keep-if (p list)
+  "keeps elements of list that satisfy p"
+  (with-expressions ((head (car list))
+                     (tail (keep-if p (cdr list))))
+    (if (funcall p head)
+        (cons head tail)
+        tail)))
 
 (defmacro let ((&rest bindings) &body body)
   "creates bindings using implicit thunks"
