@@ -30,13 +30,15 @@
                           "_"))))
 
 (defmacro delay (&body body)
-  "creates a struct containing the code to be evaluated and a place to put its evaluation"
+  "creates a struct containing the code to be evaluated and a place to
+put its evaluation"
   (cl:let ((fn `(fn0 ,@body)))
     `(make-thunk :code ,fn)))
 
 (eval-when (:compile-toplevel :load-toplevel)
   (defun force (thing)
-    "forces the evaluation of thing. If already evaluated, just returns the result"
+    "forces the evaluation of thing. If already evaluated, just
+returns the result"
     (if (thunk-p thing)
         (with-expressions ((code   (thunk-code   thing))
                            (result (thunk-result thing)))
@@ -140,7 +142,8 @@
            ,@body)))))
 
 (defun mapcar (fn list &rest lists)
-  "applies fn to corresponding elements of list and lists, returning results as a list"
+  "applies fn to corresponding elements of list and lists, returning
+results as a list"
   (let ((head  (car list))
         (heads (cl:mapcar #'car lists))
         (tail  (cdr list))
