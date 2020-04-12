@@ -1,14 +1,15 @@
-(modules:using "aliases" "macros")
+(modules:using "aliases" "macros" "lists")
 
 (defpackage :lazy
-  (:use :common-lisp :aliases :macros)
+  (:use :common-lisp :aliases :macros :lists)
   (:shadow
-     :let :cons :car :cdr :mapcar :keep-if
+     :let :cons :car :cdr :list
+     :mapcar :keep-if
      :length)
   (:export
      :thunk :delay :force :forcef
      :let
-     :cons :car :cdr
+     :cons :car :cdr :list
      :length :take :drop
      :take-while :drop-while :keep-if
      :force-cons :force-list
