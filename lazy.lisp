@@ -79,6 +79,21 @@ returns the result"
   "creates a cons with both components inside thunks"
   `(lazily cl:cons ,a ,b))
 
+(defmacro list (&rest elements)
+  "anaphoric macro to create a list. In the description of last
+element, symbol it refers to the entire list"
+  (cl:let ((it   (intern (symbol-name 'it)))
+           (init (butlast elements))
+           (tail (cl:car (last elements))))
+    (with-gensyms (list-name)
+      (cl:let ((new-tail (maptree (lambda (x) (if (eq x it)
+                                                  list-name
+                                                  x))
+                                  tail)))
+        `(cl:let ((,list-name (cl:list ,@init)))
+           (setf (cl:cdr (last ,list-name)) ,new-tail)
+           ,list-name)))))
+
 (defun length (list)
   "returns number of elements in list"
   (labels ((f (lst acc)
