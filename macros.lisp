@@ -72,9 +72,10 @@ and 'not is turned into a proper function call"
 
 (defmacro aif (condition then &optional else)
   "anaphoric macro that binds condition value to variable it, which
-     can be referenced in both then and else expressions"
-  `(let ((it ,condition))
-     (if it ,then ,else)))
+can be referenced in both then and else expressions"
+  (with-interned-symbols (it)
+    `(let ((,it ,condition))
+       (if ,it ,then ,else))))
 
 (modules:module "macros")
 (modules:used-by "aliases" "lazy")
