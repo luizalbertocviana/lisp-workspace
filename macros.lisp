@@ -15,13 +15,21 @@
                  collect `(,symbol (gensym))))
      ,@body))
 
+(defmacro with-interned-symbols ((&rest symbols) &body body)
+  "ensures each one of symbols is interned in current package. Useful
+for anaphoric macros"
+  `(let (,@(loop for symbol in symbols
+                 collect `(,symbol (intern (symbol-name ',symbol)))))
+     ,@body))
+
 (defmacro pipeline (expr &rest exprs)
-  "anaphoric macro to create a sequence of expressions where it
-     refers to the result of the previous expression"
-  (if (null exprs)
-      expr
-      `(let ((it ,expr))
-         (pipeline ,@exprs))))
+  "anaphoric macro to create a sequence of expressions where it refers
+to the result of the previous expression"
+  (with-interned-symbols (it)
+    (if (null exprs)
+        expr
+        `(let ((,it ,expr))
+           (pipeline ,@exprs)))))
 
 (defmacro alias (new-name old-name)
   "creates an alias to an already defined function or macro"
