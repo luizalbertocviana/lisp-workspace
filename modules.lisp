@@ -121,18 +121,3 @@
                                    (incf *compilation-depth*))
                                  (when (loaded ,abs-pathname-fasl)
                                    (load ,abs-pathname-fasl :verbose t))))))))
-
-(defmacro defmodule ((name &key (using nil) (used-by nil)) &body body)
-  "this macro should be used as the only toplevel form in a file. It
-   defines the concept of a module, that is, a file that may depend on
-   others to properly load or compile. This defines module NAME (must
-   be lisp filename with no extension) containing BODY forms, whose
-   compilation and loading depends on USING files. Also, whenever NAME
-   is compiled, USED-BY modules are compiled as well, which is useful
-   when USED-BY modules use macros defined in NAME"
-  `(progn
-     (using-when :compile-toplevel ,@using)
-     (using-when :load-toplevel    ,@using)
-     ,@body
-     (module ,name)
-     (used-by ,@used-by)))
