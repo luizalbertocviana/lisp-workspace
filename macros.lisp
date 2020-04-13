@@ -51,14 +51,17 @@ to the result of the previous expression"
 
 (defmacro fn1 (&body body)
   "anaphoric macro to create a lambda with one _ argument"
-  `(lambda (_) ,@body))
+  (with-interned-symbols (_)
+    `(lambda (,_) ,@body)))
 
 (defmacro fn2 (&body body)
   "anaphoric macro to create a lambda with arguments _1 and _2"
-  `(lambda (_1 _2) ,@body))
+  (with-interned-symbols (_1 _2)
+    `(lambda (,_1 ,_2) ,@body)))
 
 (defmacro compose-predicates (expr)
-  "builds a function where every symbol in expr other than 'and and 'or is turned into a proper function call"
+  "builds a function where every symbol in expr other than 'and, 'or
+and 'not is turned into a proper function call"
   (let ((logical-operators '(and or not)))
     (with-gensyms (x)
       (labels ((transform (p)
