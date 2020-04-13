@@ -52,7 +52,8 @@
   (recurse-into min-key left))
 
 (defun lookup (node key)
-  "searches for key in bstree rooted at node, returning corresponding val (or nil, in case key is not present)"
+  "searches for key in bstree rooted at node, returning corresponding
+val (or nil, in case key is not present)"
   (when node
     (with-node node
         (node-key val left right)
@@ -62,7 +63,8 @@
         (:greater (lookup right key))))))
 
 (defun insert (node key val)
-  "inserts key val pair in bstree rooted at node in case key is not present yet"
+  "inserts key val pair in bstree rooted at node in case key is not
+present yet"
   (if node
       (with-node node
           (node-key node-val left right)
@@ -73,7 +75,8 @@
       (make-leaf key val)))
 
 (defun update (node key new-val)
-  "updates key to be attached to new-val, in case key is present in node"
+  "updates key to be attached to new-val, in case key is present in
+node"
   (when node
     (with-node node
         (node-key node-val left right)
