@@ -81,18 +81,18 @@ returns the result"
 
 (defmacro list (&rest elements)
   "anaphoric macro to create a list. In the description of last
-element, symbol it refers to the entire list"
-  (cl:let ((it   (intern (symbol-name 'it)))
-           (init (butlast elements))
+element (treated as its tail), symbol it refers to the entire list"
+  (cl:let ((init (butlast elements))
            (tail (cl:car (last elements))))
     (with-gensyms (list-name)
-      (cl:let ((new-tail (maptree (lambda (x) (if (eq x it)
-                                                  list-name
-                                                  x))
-                                  tail)))
-        `(cl:let ((,list-name (cl:list ,@init)))
-           (setf (cl:cdr (last ,list-name)) ,new-tail)
-           ,list-name)))))
+      (with-interned-symbols (it)
+        (cl:let ((new-tail (maptree (fn1 (if (eq _ it)
+                                             list-name
+                                             _))
+                                    tail)))
+          `(cl:let ((,list-name (cl:list ,@init)))
+             (setf (cl:cdr (last ,list-name)) ,new-tail)
+             ,list-name))))))
 
 (defun length (list)
   "returns number of elements in list"
