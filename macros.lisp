@@ -3,7 +3,8 @@
 (defpackage :macros
   (:use :common-lisp :lists)
   (:export
-     :with-gensyms :pipeline
+     :with-gensyms :with-interned-symbols
+     :pipeline
      :alias :aliases
      :fn0 :fn1 :fn2 :compose-predicates :aif))
 
