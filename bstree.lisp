@@ -88,24 +88,55 @@ val (or nil, in case key is not present)"
 (defun insert (node key val)
   "inserts key val pair in bstree rooted at node in case key is not
 present yet"
-  (if (bstree-p node)
-      (with-node node
-          (node-key node-val left right)
-        (case (compare key node-key)
-          (:less    (new-node-from node :left (insert left key val)))
-          (:equal   node)
-          (:greater (new-node-from node :right (insert right key val)))))
+  (if node
+      (if (bstree-p node)
+          (with-node node
+              (node-key node-val left right)
+            (case (compare key node-key)
+              (:less    (new-node-from node :left (insert left key val)))
+              (:equal   node)
+              (:greater (new-node-from node :right (insert right key val)))))
+          node)
       (make-leaf key val)))
 
 (defun update (node key new-val)
   "updates key to be attached to new-val, in case key is present in
 node"
-  (when (bstree-p node)
-    (with-node node
-        (node-key node-val left right)
-      (case (compare key node-key)
-        (:less    (new-node-from node :left  (update left key new-val)))
-        (:equal   (new-node-from node :val   new-val))
-        (:greater (new-node-from node :right (update right key new-val)))))))
+  (if (bstree-p node)
+      (with-node node
+          (node-key node-val left right)
+        (case (compare key node-key)
+          (:less    (new-node-from node :left  (update left key new-val)))
+          (:equal   (new-node-from node :val   new-val))
+          (:greater (new-node-from node :right (update right key new-val)))))
+      node))
+
+(defun remove (node key)
+  "removes key val pair from bstree rooted at node"
+  (if (bstree-p node)
+      (with-node node
+          (node-key val left right)
+        (case (compare key node-key)
+          (:less    (new-node-from node :left  (remove left key)))
+          (:greater (new-node-from node :right (remove right key)))
+          (:equal   (cond ((and left right)
+                           (destructuring-bind (max-left-key . max-left-val) (max-key left)
+                             (new-node-from node :key  max-left-key
+                                                 :val  max-left-val
+                                                 :left (remove left max-left-key))))
+                          (t (or left right))))))
+      node))
+
+(defmacro insertf (place key val)
+  "updates place with (insert place key val)"
+  `(setf ,place (insert ,place ,key ,val)))
+
+(defmacro updatef (place key new-val)
+  "updates place with (update place key new-val)"
+  `(setf ,place (update ,place ,key ,new-val)))
+
+(defmacro removef (place key)
+  "updates place with (remove place key)"
+  `(setf ,place (remove ,place ,key)))
 
 (modules:module "bstree")
