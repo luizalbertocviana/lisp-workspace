@@ -2,11 +2,13 @@
 
 (defpackage :bstree
   (:use :common-lisp :aliases)
+  (:shadow :remove)
   (:export
      :make-leaf
      :compare
      :lookup :max-key :min-key
-     :insert :update))
+     :insert :update :remove
+     :insertf :updatef :removef))
 
 (in-package :bstree)
 
