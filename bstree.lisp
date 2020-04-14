@@ -18,26 +18,45 @@
         ((= a b) :equal)
         ((> a b) :greater)))
 
-(defun make-bstree (key val left right)
-  "creates a bstree node"
-  `(:key ,key :val ,val :left ,left :right ,right))
+(eval-when (:compile-toplevel :load-toplevel)
+  (defstruct (bstree)
+    "represents a binary search tree node"
+    key val left right))
 
 (defun make-leaf (key val)
   "returns a bstree node containing key and val, with empty left and right subtrees"
-  (make-bstree key val nil nil))
+  (make-bstree :key   key
+               :val   val
+               :left  nil
+               :right nil))
 
 (defmacro with-node (node (key val left right) &body body)
   "provides accessors for fields of a bstree node"
   `(with-expressions
-       ((,key   (getf ,node :key))
-        (,val   (getf ,node :val))
-        (,left  (getf ,node :left))
-        (,right (getf ,node :right)))
+       ((,key   (bstree-key   ,node))
+        (,val   (bstree-val   ,node))
+        (,left  (bstree-left  ,node))
+        (,right (bstree-right ,node)))
      ,@body))
+
+(defmacro new-node-from (node &key (key nil) (val nil) (left nil) (right nil))
+  "TODO doc"
+  `(make-bstree :key   ,(if key
+                            key
+                            `(bstree-key ,node))
+                :val   ,(if val
+                            val
+                            `(bstree-val ,node))
+                :left  ,(if left
+                            left
+                            `(bstree-left ,node))
+                :right ,(if right
+                            right
+                            `(bstree-right ,node))))
 
 (defmacro recurse-into (func child)
   "makes func recurse into node child.  If child is nil, returns node key val pair"
-  `(when node
+  `(when (bstree-p node)
      (with-node node
          (key val left right)
        (if ,child
