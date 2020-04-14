@@ -42,7 +42,8 @@
      ,@body))
 
 (defmacro new-node-from (node &key (key nil) (val nil) (left nil) (right nil))
-  "TODO doc"
+  "creates a new bstree node based on node. Replaces node fields with
+the provided ones"
   `(make-bstree :key   ,(if key
                             key
                             `(bstree-key ,node))
