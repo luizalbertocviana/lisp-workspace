@@ -3,9 +3,10 @@
 (defpackage :bstree
   (:use :common-lisp :aliases)
   (:export
+     :make-leaf
      :compare
-     :lookup :insert :update
-     :max-key :min-key))
+     :lookup :max-key :min-key
+     :insert :update))
 
 (in-package :bstree)
 
