@@ -85,24 +85,24 @@ val (or nil, in case key is not present)"
 (defun insert (node key val)
   "inserts key val pair in bstree rooted at node in case key is not
 present yet"
-  (if node
+  (if (bstree-p node)
       (with-node node
           (node-key node-val left right)
         (case (compare key node-key)
-          (:less    (make-bstree node-key node-val (insert left key val) right))
+          (:less    (new-node-from node :left (insert left key val)))
           (:equal   node)
-          (:greater (make-bstree node-key node-val left (insert right key val)))))
+          (:greater (new-node-from node :right (insert right key val)))))
       (make-leaf key val)))
 
 (defun update (node key new-val)
   "updates key to be attached to new-val, in case key is present in
 node"
-  (when node
+  (when (bstree-p node)
     (with-node node
         (node-key node-val left right)
       (case (compare key node-key)
-        (:less    (make-bstree node-key node-val (update left key new-val) right))
-        (:equal   (make-bstree node-key new-val left right))
-        (:greater (make-bstree node-key node-val left (update right key new-val)))))))
+        (:less    (new-node-from node :left  (update left key new-val)))
+        (:equal   (new-node-from node :val   new-val))
+        (:greater (new-node-from node :right (update right key new-val)))))))
 
 (modules:module "bstree")
