@@ -157,6 +157,13 @@ element (treated as its tail), symbol it refers to the entire list"
                                     collect `(,var (force ,gvar))))
            ,@body)))))
 
+(defun split-at (n list)
+  (if (and (plusp n)
+           (consp list))
+      (let ((splitted-tail (split-at (1- n) (cdr list))))
+        (cons (cons (car list) (car splitted-tail)) (cdr splitted-tail)))
+      (cl:cons nil list)))
+
 (defun mapcar (fn list &rest lists)
   "applies fn to corresponding elements of list and lists, returning
 results as a list"
