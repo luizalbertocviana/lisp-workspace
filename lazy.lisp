@@ -11,7 +11,8 @@
      :let
      :cons :car :cdr :list :length 
      :force-cons :force-list
-     :take :drop :take-while :drop-while 
+     :take :drop :split-at
+     :take-while :drop-while
      :keep-if :mapcar 
      :repeat :iterate))
 
