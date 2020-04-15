@@ -147,7 +147,7 @@ element (treated as its tail), symbol it refers to the entire list"
 
 (defmacro let ((&rest bindings) &body body)
   "creates bindings using implicit thunks"
-  (cl:let ((variables (cl:mapcar #'first bindings))
+  (cl:let ((variables (cl:mapcar #'first  bindings))
            (values    (cl:mapcar #'second bindings)))
     (cl:let ((gvariables (loop for var in variables
                                collect (gensym))))
