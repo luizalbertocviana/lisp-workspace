@@ -6,7 +6,10 @@
      :with-gensyms :with-interned-symbols
      :pipeline
      :alias :aliases
-     :fn0 :fn1 :fn2 :compose-predicates :aif))
+     :fn0 :fn1 :fn2
+     :compose-predicates
+     :not-p :and-p :or-p
+     :aif))
 
 (in-package :macros)
 
@@ -59,6 +62,25 @@ to the result of the previous expression"
   "anaphoric macro to create a lambda with arguments _1 and _2"
   (with-interned-symbols (_1 _2)
     `(lambda (,_1 ,_2) ,@body)))
+
+(defmacro not-p (p)
+  "creates a lambda that negates p"
+  (with-interned-symbols (_)
+    `(fn1 (not (funcall ,p ,_)))))
+
+(defmacro and-p (&rest preds)
+  "creates a lambda representing the conjunction of each predicate in
+preds"
+  (with-interned-symbols (_)
+    `(fn1 (and ,@(loop for pred in preds
+                       collect `(funcall ,pred ,_))))))
+
+(defmacro or-p (&rest preds)
+  "creates a lambda representing the disjunction of each predicate in
+preds"
+  (with-interned-symbols (_)
+    `(fn1 (or ,@(loop for pred in preds
+                       collect `(funcall ,pred ,_))))))
 
 (defmacro compose-predicates (expr)
   "builds a function where every symbol in expr other than 'and, 'or
