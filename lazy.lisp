@@ -9,11 +9,12 @@
   (:export
      :thunk :delay :force :forcef
      :let
-     :cons :car :cdr :list :length 
+     :cons :car :cdr :list :length
      :force-cons :force-list
      :take :drop :split-at
-     :take-while :drop-while
-     :keep-if :mapcar 
+     :take-while :drop-while :span :break
+     :keep-if :remove-if :partition
+     :mapcar
      :repeat :iterate))
 
 (in-package :lazy)
