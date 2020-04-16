@@ -4,7 +4,7 @@
   (:use :common-lisp :aliases :macros :lists)
   (:shadow
      :let :cons :car :cdr :list
-     :mapcar :keep-if
+     :mapcar :keep-if :remove-if :break
      :length)
   (:export
      :thunk :delay :force :forcef
