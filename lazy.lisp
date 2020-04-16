@@ -163,11 +163,38 @@ element (treated as its tail), symbol it refers to the entire list"
            ,@body)))))
 
 (defun split-at (n list)
+  "returns a pair of lists: the first list contains the first n
+elements of list; the second list contains the remaining elements of
+list"
   (if (and (plusp n)
            (consp list))
       (let ((splitted-tail (split-at (1- n) (cdr list))))
         (cons (cons (car list) (car splitted-tail)) (cdr splitted-tail)))
       (cl:cons nil list)))
+
+(defun span (p list)
+  "returns a pair of lists: the first list is the maximal prefix of
+list with all elements satisfying p; the second list is the
+corresponding suffix"
+  (if (and (consp list)
+           (funcall p (car list)))
+      (let ((spanned-tail (span p (cdr list))))
+        (cons (cons (car list) (car spanned-tail)) (cdr spanned-tail)))
+      (cl:cons nil list)))
+
+(defun break (p list)
+  (span (not-p p) list))
+
+(defun partition (p list)
+  "returns a pair of lists: the first list contains elements of list
+that satisfy p; the second list contains the remaining elements of
+list"
+  (if (consp list)
+      (let ((partitioned-tail (partition p (cdr list))))
+        (if (funcall p (car list))
+            (cons (cons (car list) (car partitioned-tail)) (cdr partitioned-tail))
+            (cons (car partitioned-tail) (cons (car list) (cdr partitioned-tail)))))
+      list))
 
 (defun mapcar (fn list &rest lists)
   "applies fn to corresponding elements of list and lists, returning
