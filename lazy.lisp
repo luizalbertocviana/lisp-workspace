@@ -146,6 +146,10 @@ element (treated as its tail), symbol it refers to the entire list"
         (cons head tail)
         tail)))
 
+(defun remove-if (p list)
+  "removes elements of list that satisfy p"
+  (keep-if (not-p p) list))
+
 (defmacro let ((&rest bindings) &body body)
   "creates bindings using implicit thunks"
   (cl:let ((variables (cl:mapcar #'first  bindings))
