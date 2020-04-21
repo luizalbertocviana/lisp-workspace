@@ -12,4 +12,4 @@
  keep-if          remove-if-not)
 
 (modules:module "aliases")
-(modules:used-by "lazy")
+(modules:used-by "lazy" "bstree")
