@@ -20,7 +20,7 @@
       -1))
 
 (defun transform (node)
-  "recursively transforms a bstree node into a avltree node"
+  "recursively transforms a bstree node into an avltree node"
   (if (avltree-p node)
       node
       (when (bstree:bstree-p node)
