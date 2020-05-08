@@ -4,7 +4,7 @@
   (:use :common-lisp :aliases)
   (:shadow :remove)
   (:export
-     :make-leaf :empty
+     :bstree :bstree-p :make-leaf :empty
      :compare
      :lookup :max-key :min-key
      :insert :update :remove
