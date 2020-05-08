@@ -4,7 +4,7 @@
   (:use :common-lisp :aliases)
   (:shadow :remove)
   (:export
-     :make-leaf
+     :make-leaf :empty
      :compare
      :lookup :max-key :min-key
      :insert :update :remove
@@ -24,6 +24,9 @@
   (defstruct (bstree)
     "represents a binary search tree node"
     key val left right))
+
+(defconstant empty nil
+  "representation of empty bstree")
 
 (defun make-leaf (key val)
   "returns a bstree node containing key and val, with empty left and right subtrees"
