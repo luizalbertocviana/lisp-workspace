@@ -1,11 +1,15 @@
-(modules:using "bstree")
+(modules:using "aliases" "bstree")
 
 (defpackage :avltree
-  (:use :common-lisp)
-  (:import-from :bstree :lookup :empty)
+  (:use :common-lisp :aliases)
+  (:import-from :bstree
+     :lookup :empty :compare :max-key :min-key)
   (:export
      :avltree :avltree-p :make-leaf :empty
-     :lookup))
+     :compare
+     :lookup :max-key :min-key
+     :insert :update
+     :insertf :updatef))
 
 (in-package :avltree)
 
