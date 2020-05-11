@@ -112,10 +112,10 @@
       (case (balance-factor node)
         (:left-heavy (case (balance-factor left)
                        (:left-pending (rotate-r node))
-                       ((:right-pending :balanced) node)))
+                       ((:right-pending :balanced) (rotate-lr node))))
         (:right-heavy (case (balance-factor right)
-                        (:left-pending node)
-                        ((:right-pending :balanced) node)))
+                        (:right-pending (rotate-l node))
+                        ((:left-pending :balanced) (rotate-rl node))))
         (otherwise node)))))
 
 (defun rebalance-path-to-key (node key)
