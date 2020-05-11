@@ -75,6 +75,35 @@
         (update-height node)
         node))))
 
+(defun rotate-l (node)
+  "returns a left rotated version of node"
+  (when (avltree-p node)
+    (with-node node
+        (node-key node-val left right node-height)
+      (with-node right
+          (right-key right-val right-left right-right right-height)
+        (rotatef right right-left node)
+        (update-height left)
+        (update-height right)
+        (update-height node)
+        node))))
+
+(defun rotate-lr (node)
+  "returns a left-right doubly rotated version of node"
+  (when (avltree-p node)
+    (with-node node
+        (key val left right height)
+      (setf left (rotate-l left))
+      (rotate-r node))))
+
+(defun rotate-rl (node)
+  "returns a right-left doubly rotated version of node"
+  (when (avltree-p node)
+    (with-node node
+        (key val left right height)
+      (setf right (rotate-r right))
+      (rotate-l node))))
+
 (defun rebalance (node)
   "returns a balanced version of node"
   (when (avltree-p node)
