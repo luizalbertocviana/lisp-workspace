@@ -79,13 +79,13 @@ the provided ones"
 
 (defun lookup (node key)
   "searches for key in bstree rooted at node, returning corresponding
-val (or nil, in case key is not present)"
+(key . val) (or nil, in case key is not present)"
   (when (bstree-p node)
     (with-node node
         (node-key val left right)
       (case (compare key node-key)
         (:less    (lookup left key))
-        (:equal   val)
+        (:equal   (cons key val))
         (:greater (lookup right key))))))
 
 (defun insert (node key val)
