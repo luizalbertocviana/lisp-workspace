@@ -131,14 +131,22 @@ present yet"
       (if (and (avltree-p node)
                (not (lookup node key)))
           (let* ((modified-node (bstree:insert node key val))
-                 (path          (path-to-key modified-node key))
-                 ;; as node is not nil, path has at least two nodes
-                 (parent-node   (second path)))
-            (case (compare key (avltree-key parent-node))
-              (:less    (setf (avltree-left  parent-node) (transform (avltree-left  parent-node))))
-              (:greater (setf (avltree-right parent-node) (transform (avltree-right parent-node)))))
-            modified-node)
+                 (avl-node      (transform modified-node)))
+            (rebalance-path-to-key avl-node key))
           node)
       (make-leaf key val)))
+
+(defun update (node key new-val)
+  "updates key to be attached to new-val, in case key is present in
+node"
+  (transform (bstree:update node key new-val)))
+
+(defmacro insertf (place key val)
+  "updates place with (insert place key val)"
+  `(setf ,place (insert ,place ,key ,val)))
+
+(defmacro updatef (place key val)
+  "updates place with (insert place key val)"
+  `(setf ,place (update ,place ,key ,val)))
 
 (modules:module "avltree")
