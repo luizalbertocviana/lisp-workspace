@@ -189,4 +189,8 @@ node"
   "updates place with (insert place key val)"
   `(setf ,place (update ,place ,key ,val)))
 
+(defmacro removef (place key)
+  "updates place with (insert place key val)"
+  `(setf ,place (remove ,place ,key)))
+
 (modules:module "avltree")
