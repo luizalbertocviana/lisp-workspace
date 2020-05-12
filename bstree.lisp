@@ -124,9 +124,10 @@ of modified node and key of parent who had a child removed"
           ;; this function may make a recursive call. If it does, such
           ;; a call returns exactly one value iff it deletes its
           ;; node. This way, if subtree-key is nil, we know that node
-          ;; had a child deleted; otherwise, removal have taken place
-          ;; deep down in the tree. Thus, (or subtree-key node-key)
-          ;; evaluates to the key of a parent who had a child removed
+          ;; had a child deleted; otherwise, removal may have taken
+          ;; place deep down in the tree. Thus, (or subtree-key
+          ;; node-key) evaluates to the key of a parent who had a
+          ;; child removed
           (:less    (multiple-value-bind (modified-left subtree-key) (remove left key)
                       (values (new-node-from node :left modified-left)
                               (or subtree-key node-key))))
