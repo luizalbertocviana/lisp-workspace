@@ -166,6 +166,16 @@ present yet"
           node)
       (make-leaf key val)))
 
+(defun remove (node key)
+  "removes key val pair from avltree rooted at node"
+  (if (avltree-p node)
+      (if (lookup node key)
+          (multiple-value-bind (modified-node parent-key) (bstree:remove node key)
+            (let ((avl-node (transform modified-node)))
+              (rebalance-path-to-key avl-node parent-key)))
+          node)
+      node))
+
 (defun update (node key new-val)
   "updates key to be attached to new-val, in case key is present in
 node"
