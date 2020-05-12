@@ -61,13 +61,13 @@ the provided ones"
                             `(bstree-right ,node))))
 
 (defmacro recurse-into (func child)
-  "makes func recurse into node child.  If child is nil, returns node key val pair"
+  "makes func recurse into node child.  If child is nil, returns node key val pair as values"
   `(when (bstree-p node)
      (with-node node
          (key val left right)
        (if ,child
            (,func ,child)
-           (cons key val)))))
+           (values key val)))))
 
 (defun max-key (node)
   "returns key val pair whose key is maximum"
