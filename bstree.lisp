@@ -115,19 +115,32 @@ node"
       node))
 
 (defun remove (node key)
-  "removes key val pair from bstree rooted at node"
+  "removes key val pair from bstree rooted at node, returning values
+of modified node and key of parent who had a child removed"
   (if (bstree-p node)
       (with-node node
           (node-key val left right)
         (case (compare key node-key)
-          (:less    (new-node-from node :left  (remove left key)))
-          (:greater (new-node-from node :right (remove right key)))
-          (:equal   (cond ((and left right)
-                           (destructuring-bind (max-left-key . max-left-val) (max-key left)
-                             (new-node-from node :key  max-left-key
-                                                 :val  max-left-val
-                                                 :left (remove left max-left-key))))
-                          (t (or left right))))))
+          ;; this function may make a recursive call. If it does, such
+          ;; a call returns exactly one value iff it deletes its
+          ;; node. This way, if subtree-key is nil, we know that node
+          ;; had a child deleted; otherwise, removal have taken place
+          ;; deep down in the tree. Thus, (or subtree-key node-key)
+          ;; evaluates to the key of a parent who had a child removed
+          (:less    (multiple-value-bind (modified-left subtree-key) (remove left key)
+                      (values (new-node-from node :left modified-left)
+                              (or subtree-key node-key))))
+          (:greater (multiple-value-bind (modified-right subtree-key) (remove right key)
+                      (values (new-node-from node :right modified-right)
+                              (or subtree-key node-key))))
+          (:equal   (if (and left right)
+                        (multiple-value-bind (max-left-key max-left-val) (max-key left)
+                          (multiple-value-bind (modified-left subtree-key) (remove left max-left-key)
+                            (values (new-node-from node :key  max-left-key
+                                                        :val  max-left-val
+                                                        :left modified-left)
+                                    (or subtree-key node-key))))
+                        (or left right)))))
       node))
 
 (defmacro insertf (place key val)
