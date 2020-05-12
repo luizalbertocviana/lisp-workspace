@@ -156,3 +156,4 @@ of modified node and key of parent who had a child removed"
   `(setf ,place (remove ,place ,key)))
 
 (modules:module "bstree")
+(modules:used-by "avltree")
