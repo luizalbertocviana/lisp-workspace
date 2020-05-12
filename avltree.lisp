@@ -2,14 +2,15 @@
 
 (defpackage :avltree
   (:use :common-lisp :aliases)
+  (:shadow :remove)
   (:import-from :bstree
      :lookup :empty :compare :max-key :min-key)
   (:export
      :avltree :avltree-p :make-leaf :empty
      :compare
      :lookup :max-key :min-key
-     :insert :update
-     :insertf :updatef))
+     :insert :update :remove
+     :insertf :updatef :removef))
 
 (in-package :avltree)
 
