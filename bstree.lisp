@@ -70,11 +70,11 @@ the provided ones"
            (values key val)))))
 
 (defun max-key (node)
-  "returns key val pair whose key is maximum"
+  "returns values of key val pair whose key is maximum"
   (recurse-into max-key right))
 
 (defun min-key (node)
-  "returns key val pair whose key is minimum"
+  "returns values of key val pair whose key is minimum"
   (recurse-into min-key left))
 
 (defun lookup (node key)
