@@ -1,7 +1,7 @@
 (modules:using "aliases" "bstree" "macros")
 
 (defpackage :avltree
-  (:use :common-lisp :aliases)
+  (:use :common-lisp :aliases :macros)
   (:shadow :remove)
   (:import-from :bstree
      :lookup :empty :compare :max-key :min-key)
