@@ -13,7 +13,8 @@
         (cons pair (apply #'pairs others)))))
 
 (defun maptree (f tree)
-  "returns a copy of tree with each of its non-nil elements transformed by f"
+  "returns a copy of tree with each of its non-nil elements
+transformed by f"
   (cond ((null tree) nil)
         ((atom tree) (funcall f tree))
         ((consp tree)
