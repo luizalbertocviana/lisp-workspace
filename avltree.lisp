@@ -1,4 +1,4 @@
-(modules:using "aliases" "bstree")
+(modules:using "aliases" "bstree" "macros")
 
 (defpackage :avltree
   (:use :common-lisp :aliases)
