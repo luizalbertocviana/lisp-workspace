@@ -71,9 +71,8 @@
       (with-node left
           (left-key left-val left-left left-right left-height)
         (rotatef left left-right node)
-        (update-height left)
-        (update-height right)
-        (update-height node)
+        (for-each n (left right node)
+          (update-height n))
         node))))
 
 (defun rotate-l (node)
@@ -84,9 +83,8 @@
       (with-node right
           (right-key right-val right-left right-right right-height)
         (rotatef right right-left node)
-        (update-height left)
-        (update-height right)
-        (update-height node)
+        (for-each n (left right node)
+          (update-height n))
         node))))
 
 (defun rotate-lr (node)
