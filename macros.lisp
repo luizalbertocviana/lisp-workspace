@@ -7,6 +7,7 @@
      :pipeline
      :alias :aliases
      :fn0 :fn1 :fn2
+     :for-each
      :compose-predicates
      :not-p :and-p :or-p
      :aif))
@@ -62,6 +63,17 @@ to the result of the previous expression"
   "anaphoric macro to create a lambda with arguments _1 and _2"
   (with-interned-symbols (_1 _2)
     `(lambda (,_1 ,_2) ,@body)))
+
+(defmacro for-each (sym (&rest exprs) &body body)
+  "for each expr in exprs, runs body one time, replacing every
+occurrence of var with expr"
+  (let* ((bodies (loop for expr in exprs
+                       collect (maptree (fn1 (if (eq _ sym)
+                                                 expr
+                                                 _))
+                                        body)))
+         (conc-bodies (apply #'nconc bodies)))
+    `(progn ,@conc-bodies)))
 
 (defmacro not-p (p)
   "creates a lambda that negates p"
