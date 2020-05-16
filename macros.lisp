@@ -6,7 +6,7 @@
      :with-gensyms :with-interned-symbols
      :pipeline
      :alias :aliases
-     :fn0 :fn1 :fn2
+     :fn0 :fn1 :fn2 :partial
      :for-each
      :compose-predicates
      :not-p :and-p :or-p
@@ -63,6 +63,10 @@ to the result of the previous expression"
   "anaphoric macro to create a lambda with arguments _1 and _2"
   (with-interned-symbols (_1 _2)
     `(lambda (,_1 ,_2) ,@body)))
+
+(defmacro partial (f &rest args)
+  (with-gensyms (more-args)
+    `(lambda (&rest ,more-args) (apply ,f ,@args ,more-args))))
 
 (defmacro for-each (sym (&rest exprs) &body body)
   "for each expr in exprs, runs body one time, replacing every
