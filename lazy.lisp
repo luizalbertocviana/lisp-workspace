@@ -185,6 +185,9 @@ corresponding suffix"
       (cl:cons nil list)))
 
 (defun break (p list)
+  "returns a pair of lists: the first list is the maximal prefix of
+list with all elements not satisfying p; the second list is the
+corresponding suffix"
   (span (not-p p) list))
 
 (defun partition (p list)
