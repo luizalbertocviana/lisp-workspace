@@ -64,7 +64,9 @@ returns the result"
 
 (defun force-cons (c)
   "calls car and cdr on c, thus forcing its evaluation"
-  (car c) (cdr c) c)
+  (for-each f (car cdr)
+    (f c))
+  c)
 
 (defun force-list (list)
   "forces evaluation of entire list"
