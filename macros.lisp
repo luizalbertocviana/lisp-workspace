@@ -65,6 +65,8 @@ to the result of the previous expression"
     `(lambda (,_1 ,_2) ,@body)))
 
 (defmacro partial (f &rest args)
+  "returns a function representing a partial application of f over
+args"
   (with-gensyms (more-args)
     `(lambda (&rest ,more-args) (apply ,f ,@args ,more-args))))
 
