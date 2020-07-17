@@ -24,3 +24,9 @@
 /lisp.org~
 /avltree.lisp~
 *.fas
+/.ccls
+/.ccls-cache/
+/bstree-cpp.lisp~
+/bstree.hpp~
+/bstree_interface.cpp~
+/bstree.so
