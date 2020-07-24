@@ -38,4 +38,15 @@
                         collect `(type ,@type-var)))
      ,@body))
 
+(defmacro type-let ((&rest type-bindings) &body body)
+  (let* ((types      (mapcar #'first type-bindings))
+         (vars       (mapcar #'second type-bindings))
+         (vals       (mapcar #'third type-bindings))
+         (typed-vars (mapcar #'list types vars))
+         (typed-vals (mapcar (fn2 `(the ,_1 ,_2)) types vals))
+         (bindings   (mapcar #'list vars typed-vals)))
+    `(let ,bindings
+       (with-types ,typed-vars
+         ,@body))))
+
 (modules:module "compiling")
