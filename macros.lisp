@@ -64,6 +64,11 @@ to the result of the previous expression"
   (with-interned-symbols (_1 _2)
     `(lambda (,_1 ,_2) ,@body)))
 
+(defmacro fn3 (&body body)
+  "anaphoric macro to create a lambda with arguments _1, _2 and _3"
+  (with-interned-symbols (_1 _2 _3)
+    `(lambda (,_1 ,_2 ,_3) ,@body)))
+
 (defmacro partial (f &rest args)
   "returns a function representing a partial application of f over
 args"
