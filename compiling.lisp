@@ -1,5 +1,7 @@
+(modules:using "macros")
+
 (defpackage :compiling
-  (:use :common-lisp)
+  (:use :common-lisp :macros)
   (:export
      :compiling-for
      :disassemble-for
