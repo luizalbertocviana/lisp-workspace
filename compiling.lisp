@@ -49,4 +49,10 @@
        (with-types ,typed-vars
          ,@body))))
 
+(defmacro type-defun (name (returns &rest type-vars) &optional (doc "") &body body)
+  (let ((vars (mapcar #'second type-vars)))
+    `(defun ,name ,vars ,doc
+       (with-types ,type-vars
+         (the ,returns (progn ,@body))))))
+
 (modules:module "compiling")
