@@ -3,9 +3,8 @@
 (defpackage :compiling
   (:use :common-lisp :macros)
   (:export
-     :compiling-for
-     :disassemble-for
-     :with-types))
+     :compiling-for :disassemble-for
+     :with-types :type-let :type-defun))
 
 (in-package :compiling)
 
