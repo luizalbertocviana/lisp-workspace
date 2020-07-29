@@ -18,7 +18,7 @@
   positions are initialized as initial-element (defaults to 0)"
   (make-matrix :data (make-array `(,number-rows ,number-cols)
                                  :element-type type
-                                 :initial-element initial-element)
+                                 :initial-element (coerce initial-element type))
                :number-rows number-rows
                :number-cols number-cols))
 
@@ -36,7 +36,7 @@
   (let ((id (square-matrix :type      type
                            :dimension dimension)))
     (dotimes (i dimension)
-      (setf (aref id i i) 1))
+      (setf (aref id i i) (coerce 1 type)))
     id))
 
 (defun aref (matrix row col)
