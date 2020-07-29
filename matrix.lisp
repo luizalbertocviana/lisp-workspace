@@ -70,4 +70,13 @@ stored in matrix-a"
   "sum matrix and matrices, storing result in matrix"
   (apply #'reduce-matrices #'+ matrix matrices))
 
+(defun incf-product (result matrix-a matrix-b)
+  "sums to result the product of matrix-a and matrix-b"
+  (dotimes (i (matrix-number-rows matrix-a))
+    (dotimes (j (matrix-number-cols matrix-b))
+      (dotimes (k (matrix-number-cols matrix-a))
+        (incf (aref result i j)
+              (* (aref matrix-a i k)
+                 (aref matrix-b k j)))))))
+
 (modules:module "matrix")
