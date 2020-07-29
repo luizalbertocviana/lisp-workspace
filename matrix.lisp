@@ -16,6 +16,7 @@
 (defstruct (matrix)
   "represnets a matrix"
   (data        nil :type (simple-array))
+  (type)
   (number-rows nil :type (integer 0))
   (number-cols nil :type (integer 0)))
 
