@@ -92,4 +92,20 @@ stored in matrix-a"
               (* (aref matrix-a i k)
                  (aref matrix-b k j)))))))
 
+(defgeneric add (matrix-a matrix-b)
+  (:documentation "returns result of adding matrix-a and matrix-b"))
+
+(defgeneric multiply (matrix-a matrix-b)
+  (:documentation "returns product of matrix-a and matrix-b"))
+
+(defmethod add ((matrix-a matrix) (matrix-b matrix))
+  (reduce-two-matrices #'+ (copy-matrix matrix-a) matrix-b))
+
+(defmethod multiply ((matrix-a matrix) (matrix-b matrix))
+  (let ((result (new-matrix :type        (element-type matrix-a)
+                            :number-rows (matrix-number-rows matrix-a)
+                            :number-cols (matrix-number-cols matrix-b))))
+    (incf-product result matrix-a matrix-b)
+    result))
+
 (modules:module "matrix")
