@@ -31,6 +31,7 @@
   (make-matrix :data (make-array `(,number-rows ,number-cols)
                                  :element-type type
                                  :initial-element (coerce initial-element type))
+               :type type
                :number-rows number-rows
                :number-cols number-cols))
 
