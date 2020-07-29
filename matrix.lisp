@@ -4,10 +4,12 @@
   (:use :common-lisp :macros)
   (:shadow :aref :identity)
   (:export
-     :new-matrix :square-matrix :identity
-     :aref
+     :matrix :new-matrix :matrix-p :matrix-number-rows :matrix-number-cols
+     :square-matrix :identity
+     :element-type :aref
      :reduce-two-matrices :reduce-matrices
-     :sum :incf-product))
+     :add :sum
+     :multiply :incf-product))
 
 (in-package :matrix)
 
