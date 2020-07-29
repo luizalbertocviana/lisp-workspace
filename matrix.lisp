@@ -2,7 +2,12 @@
 
 (defpackage :matrix
   (:use :common-lisp :macros)
-  (:shadow :aref :identity))
+  (:shadow :aref :identity)
+  (:export
+     :new-matrix :square-matrix :identity
+     :aref
+     :reduce-two-matrices :reduce-matrices
+     :sum :incf-product))
 
 (in-package :matrix)
 
