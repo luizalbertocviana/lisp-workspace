@@ -124,4 +124,4 @@ can be referenced in both then and else expressions"
        (if ,it ,then ,else))))
 
 (modules:module "macros")
-(modules:used-by "aliases" "lazy")
+(modules:used-by "aliases" "lazy" "avltree" "compiling" "matrix")
