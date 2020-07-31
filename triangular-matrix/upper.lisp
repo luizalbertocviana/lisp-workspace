@@ -1,6 +1,7 @@
 (modules:using "matrix" "macros")
 
 (defpackage :triangular-matrix/upper
+  (:nicknames :tri-upper)
   (:use :common-lisp :macros)
   (:import-from :matrix :add :multiply)
   (:shadow :aref :identity))
