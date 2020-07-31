@@ -67,13 +67,18 @@ stored in matrix-a"
                      (aref matrix-b i j)))))
   matrix-a)
 
+(defun reduce-matrices-with-reductor (op reductor matrix &rest matrices)
+  "reduces matrix and matrices applying op position-wise using reductor. Result is
+  stored in matrix"
+  (when matrices
+    (reduce (fn2 (funcall reductor op _1 _2)) matrices
+            :initial-value matrix))
+  matrix)
+
 (defun reduce-matrices (op matrix &rest matrices)
   "reduces matrix and matrices applying op position-wise. Result is
   stored in matrix"
-  (when matrices
-    (reduce (fn2 (reduce-two-matrices op _1 _2)) matrices
-            :initial-value matrix))
-  matrix)
+  (apply #'reduce-matrices-with-reductor op #'reduce-two-matrices matrix matrices))
 
 (defun sum (matrix &rest matrices)
   "sum matrix and matrices, storing result in matrix"
