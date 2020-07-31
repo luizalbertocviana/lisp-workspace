@@ -4,9 +4,9 @@
   (:use :common-lisp :macros)
   (:shadow :aref :identity)
   (:export
-     :matrix :new-matrix :matrix-p :matrix-number-rows :matrix-number-cols
+     :matrix :new-matrix :copy-matrix :matrix-p :matrix-number-rows :matrix-number-cols :matrix-type
      :square-matrix :identity
-     :element-type :aref
+     :aref
      :reduce-two-matrices :reduce-matrices
      :add :sum
      :multiply :incf-product))
