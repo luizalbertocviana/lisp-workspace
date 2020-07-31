@@ -103,7 +103,7 @@ stored in matrix-a"
   (reduce-two-matrices #'+ (copy-matrix matrix-a) matrix-b))
 
 (defmethod multiply ((matrix-a matrix) (matrix-b matrix))
-  (let ((result (new-matrix :type        (element-type matrix-a)
+  (let ((result (new-matrix :type        (matrix-type matrix-a)
                             :number-rows (matrix-number-rows matrix-a)
                             :number-cols (matrix-number-cols matrix-b))))
     (incf-product result matrix-a matrix-b)
