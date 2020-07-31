@@ -34,3 +34,4 @@
 /matrix.lisp~
 /teste.lisp~
 /triangular-matrix.lisp~
+*.lisp#
