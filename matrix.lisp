@@ -40,14 +40,6 @@
               :number-cols     dimension
               :initial-element initial-element))
 
-(defun identity (&key (type 'number) dimension)
-  "creates an identity matrix"
-  (let ((id (square-matrix :type      type
-                           :dimension dimension)))
-    (dotimes (i dimension)
-      (setf (aref id i i) (coerce 1 type)))
-    id))
-
 (defun aref (matrix row col)
   "element of matrix at position (row col)"
   (cl:aref (matrix-data matrix) row col))
@@ -55,6 +47,14 @@
 (defun (setf aref) (value matrix row col)
   "sets (row col) position of matrix to value"
   (setf (cl:aref (matrix-data matrix) row col) value))
+
+(defun identity (&key (type 'number) dimension)
+  "creates an identity matrix"
+  (let ((id (square-matrix :type      type
+                           :dimension dimension)))
+    (dotimes (i dimension)
+      (setf (aref id i i) (coerce 1 type)))
+    id))
 
 (defun reduce-two-matrices (op matrix-a matrix-b)
   "reduces matrix-a and matrix-b applying op position-wise. Result is
