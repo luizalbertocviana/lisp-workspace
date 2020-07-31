@@ -4,7 +4,11 @@
   (:nicknames :tri-upper)
   (:use :common-lisp :macros)
   (:import-from :matrix :add :multiply)
-  (:shadow :aref :identity))
+  (:shadow :aref :identity)
+  (:export
+     :matrix :new-matrix
+     :aref
+     :identity))
 
 (in-package :triangular-matrix/upper)
 
