@@ -132,6 +132,7 @@ stored in matrix-a"
           (loop for k from i below (matrix-dimension matrix-a)
                 do (incf (matrix:aref result i j)
                          (* (aref        matrix-a i k)
-                            (matrix:aref matrix-b k j)))))))))
+                            (matrix:aref matrix-b k j))))))
+      result)))
 
 (modules:module "triangular-matrix/upper")
