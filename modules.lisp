@@ -10,7 +10,7 @@
    modules by absolute path")
 
 (defun loaded (name)
-  "returns t iff name is a member of *base-path* (module is
+  "returns t iff name is a member of *user-modules* (module is
    loaded). Name should be a fasl absolute path. This is intended for
    internal use"
   (member name *user-modules* :test #'equal))
