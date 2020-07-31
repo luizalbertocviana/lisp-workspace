@@ -20,10 +20,6 @@
   (number-rows nil :type (integer 0))
   (number-cols nil :type (integer 0)))
 
-(defun element-type (matrix)
-  "returns element type stored in matrix"
-  (matrix-type matrix))
-
 (defun new-matrix (&key (type 'number) number-rows number-cols (initial-element 0))
   "creates a matrix with elements typed to type (defaults to number)
   whose dimensions are determined by number-rows and number-cols. All
