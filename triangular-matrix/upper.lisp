@@ -6,9 +6,11 @@
   (:import-from :matrix :add :multiply)
   (:shadow :aref :identity)
   (:export
-     :matrix :new-matrix
+     :matrix :new-matrix :matrix-type :matrix-dimension
      :aref
-     :identity))
+     :identity
+     :reduce-two-matrices :reduce-matrices
+     :incf-product))
 
 (in-package :triangular-matrix/upper)
 
