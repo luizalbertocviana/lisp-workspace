@@ -63,4 +63,35 @@ stored in matrix-a"
                           (matrix-data matrix-a)
                           (matrix-data matrix-b)))
 
+(defmethod add ((matrix-a matrix) (matrix-b matrix))
+  (reduce-two-matrices #'+ (copy-matrix matrix-a) matrix-b))
+
+(defmethod add ((matrix-a tri-upper:matrix) (matrix-b matrix))
+  (let* ((dim    (tri-upper:matrix-dimension matrix-a))
+         (result (matrix:square-matrix :type      (tri-upper:matrix-type matrix-a)
+                                       :dimension dim)))
+    (dotimes (i dim)
+      (dotimes (j dim)
+        (setf (matrix:aref result i j)
+              (cond ((= i j) (+ (tri-upper:aref matrix-a i j)
+                                (aref           matrix-b i j)))
+                    ((< i j) (tri-upper:aref matrix-a i j))
+                    ((> i j) (aref matrix-b i j))))))
+    result))
+
+(defmethod add ((matrix-a matrix) (matrix-b tri-upper:matrix))
+  (add matrix-b matrix-a))
+
+(defmethod add ((matrix-a matrix:matrix) (matrix-b matrix))
+  (let ((dim    (matrix:matrix-number-rows matrix-a))
+        (result (matrix:copy-matrix matrix-a)))
+    (dotimes (i dim)
+      (loop for j from 0 to i
+            do (incf (matrix:aref result i j)
+                     (aref matrix-b i j))))
+    result))
+
+(defmethod add ((matrix-a matrix) (matrix-b matrix:matrix))
+  (add matrix-b matrix-a))
+
 (modules:module "triangular-matrix/lower")
