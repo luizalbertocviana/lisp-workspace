@@ -1,7 +1,8 @@
-(modules:using "triangular-matrix/upper")
+(modules:using "matrix" "triangular-matrix/upper")
 
 (defpackage :triangular-matrix/lower
   (:use :common-lisp)
+  (:import-from :matrix :add :multiply)
   (:shadow :aref :identity))
 
 (in-package :triangular-matrix/lower)
