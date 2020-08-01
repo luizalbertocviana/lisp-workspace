@@ -53,4 +53,8 @@ stored in matrix-a"
                              (matrix-data matrix)
                              (mapcar #'matrix-data matrices)))
 
+(defun sum (matrix &rest matrices)
+  "sum matrix and matrices, storing result in matrix"
+  (apply #'reduce-matrices #'+ matrix matrices))
+
 (modules:module "triangular-matrix/lower")
