@@ -46,4 +46,11 @@ stored in matrix-a"
                                  (matrix-data matrix-b))
   matrix-a)
 
+(defun reduce-matrices (op matrix &rest matrices)
+  "reduces matrix and matrices applying op position-wise. Result is
+  stored in matrix"
+  (tri-upper:reduce-matrices op
+                             (matrix-data matrix)
+                             (mapcar #'matrix-data matrices)))
+
 (modules:module "triangular-matrix/lower")
