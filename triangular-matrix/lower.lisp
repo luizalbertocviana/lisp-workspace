@@ -57,4 +57,10 @@ stored in matrix-a"
   "sum matrix and matrices, storing result in matrix"
   (apply #'reduce-matrices #'+ matrix matrices))
 
+(defun incf-product (result matrix-a matrix-b)
+  "sums to result the product of matrix-a and matrix-b"
+  (tri-upper:incf-product (matrix-data result)
+                          (matrix-data matrix-a)
+                          (matrix-data matrix-b)))
+
 (modules:module "triangular-matrix/lower")
