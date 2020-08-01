@@ -38,4 +38,12 @@
                :type type
                :dimension dimension))
 
+(defun reduce-two-matrices (op matrix-a matrix-b)
+  "reduces matrix-a and matrix-b applying op position-wise. Result is
+stored in matrix-a"
+  (tri-upper:reduce-two-matrices op
+                                 (matrix-data matrix-a)
+                                 (matrix-data matrix-b))
+  matrix-a)
+
 (modules:module "triangular-matrix/lower")
