@@ -101,4 +101,62 @@ stored in matrix-a"
 (defmethod add ((matrix-a matrix) (matrix-b matrix:matrix))
   (add matrix-b matrix-a))
 
+(defmethod multiply ((matrix-a matrix) (matrix-b matrix))
+  (let ((result (new-matrix :type      (matrix-type matrix-a)
+                            :dimension (matrix-dimension matrix-a))))
+    (incf-product result matrix-a matrix-b)
+    result))
+
+(defmethod multiply ((matrix-a matrix:matrix) (matrix-b matrix))
+  (let ((num-rows (matrix:matrix-number-rows matrix-a))
+        (num-cols (matrix-dimension matrix-b)))
+    (let ((result (matrix:new-matrix :type (matrix:matrix-type matrix-a)
+                                     :number-rows num-rows
+                                     :number-cols num-cols)))
+      (dotimes (i num-rows)
+        (dotimes (j num-cols)
+          (loop for k from j below num-cols
+                do (incf (matrix:aref result i j)
+                         (* (matrix:aref matrix-a i k)
+                            (aref        matrix-b k j))))))
+      result)))
+
+(defmethod multiply ((matrix-a matrix) (matrix-b matrix:matrix))
+  (let ((num-rows (matrix-dimension matrix-a))
+        (num-cols (matrix:matrix-number-cols matrix-b)))
+    (let ((result (matrix:new-matrix :type (matrix-type matrix-a)
+                                     :number-rows num-rows
+                                     :number-cols num-cols)))
+      (dotimes (i num-rows)
+        (dotimes (j num-cols)
+          (loop for k from 0 to i
+                do (incf (matrix:aref result i j)
+                         (* (aref        matrix-a i k)
+                            (matrix:aref matrix-b k j))))))
+      result)))
+
+(defmethod multiply ((matrix-a tri-upper:matrix) (matrix-b matrix))
+  (let* ((dim    (tri-upper:matrix-dimension matrix-a))
+         (result (matrix:square-matrix :type      (tri-upper:matrix-type matrix-a)
+                                       :dimension dim)))
+    (dotimes (i dim)
+      (dotimes (j dim)
+        (loop for k from (max i j) below dim
+              do (incf (matrix:aref result i j)
+                       (* (tri-upper:aref matrix-a i k)
+                          (aref           matrix-b k j))))))
+    result))
+
+(defmethod multiply ((matrix-a matrix) (matrix-b tri-upper:matrix))
+  (let* ((dim    (matrix-dimension matrix-a))
+         (result (matrix:square-matrix :type      (matrix-type matrix-a)
+                                       :dimension dim)))
+    (dotimes (i dim)
+      (dotimes (j dim)
+        (loop for k from 0 to (min i j)
+              do (incf (matrix:aref result i j)
+                       (* (aref           matrix-a i k)
+                          (tri-upper:aref matrix-b k j))))))
+    result))
+
 (modules:module "triangular-matrix/lower")
