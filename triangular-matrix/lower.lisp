@@ -16,7 +16,7 @@
 
 (defstruct (matrix)
   "represents a lower triangular matrix"
-  (data nil :type triangular-matrix/upper:matrix)
+  (data nil :type tri-upper:matrix)
   (type)
   (dimension nil :type (integer 0)))
 
