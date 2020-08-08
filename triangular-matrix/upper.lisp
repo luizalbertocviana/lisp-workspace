@@ -34,7 +34,7 @@
 (defun aref (matrix row col)
   "element of matrix at position (row col)"
   (if (> row col)
-      0
+      (coerce 0 (matrix-type matrix))
       (let* ((mat      (matrix-data matrix))
              (dim      (matrix-dimension matrix))
              (mat-rows (matrix:matrix-number-rows mat)))
