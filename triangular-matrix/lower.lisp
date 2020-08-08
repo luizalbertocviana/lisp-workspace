@@ -21,7 +21,7 @@
   (dimension nil :type (integer 0)))
 
 (defun new-matrix (&key (type 'number) dimension (initial-element 0))
-  "creates an lower triangular matrix with elements typed to
+  "creates a lower triangular matrix with elements typed to
   type (defaults to number) and dimension. All positions (except the
   upper triangle) are initialized as initial-element (defaults to 0)"
   (make-matrix :data (tri-upper:new-matrix :type            type
