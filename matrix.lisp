@@ -81,7 +81,7 @@ stored in matrix-a"
   (apply #'reduce-matrices-with-reductor op #'reduce-two-matrices matrix matrices))
 
 (defun sum (matrix &rest matrices)
-  "sum matrix and matrices, storing result in matrix"
+  "sums matrix and matrices, storing result in matrix"
   (apply #'reduce-matrices #'+ matrix matrices))
 
 (defun incf-product (result matrix-a matrix-b)
