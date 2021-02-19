@@ -112,12 +112,15 @@ present yet"
   "updates key to be attached to new-val, in case key is present in
 node"
   (if (bstree-p node)
-      (with-node node
-          (node-key node-val left right)
-        (case (compare key node-key)
-          (:less    (new-node-from node :left  (update left key new-val)))
-          (:equal   (new-node-from node :val   new-val))
-          (:greater (new-node-from node :right (update right key new-val)))))
+      (with-node current
+          (current-key current-val left right)
+        (do ((current node (case (compare key current-key)
+                             (:less left)
+                             (:equal (progn
+                                       (setf current-val new-val)
+                                       nil))
+                             (:greater right))))
+            ((null current) node)))
       node))
 
 (defun remove (node key)
