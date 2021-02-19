@@ -191,12 +191,11 @@ right subtrees"
   "inserts key val pair in avltree rooted at node in case key is not
 present yet"
   (if node
-      (if (and (avltree-p node)
-               (not (lookup node key)))
+      (if (lookup node key)
+          node
           (let* ((modified-node (bstree:insert node key val))
-                 (avl-node      (transform modified-node)))
-            (rebalance-path-to-key avl-node key))
-          node)
+                 (transformed-node (transform-node-with-key modified-node key)))
+            (rebalance-path-to-key transformed-node key)))
       (make-leaf key val)))
 
 (defun remove (node key)
