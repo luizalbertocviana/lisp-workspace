@@ -93,12 +93,18 @@ key and val as values (or nil, in case key is not present)"
 present yet"
   (if node
       (if (bstree-p node)
-          (with-node node
-              (node-key node-val left right)
-            (case (compare key node-key)
-              (:less    (new-node-from node :left (insert left key val)))
-              (:equal   node)
-              (:greater (new-node-from node :right (insert right key val)))))
+          (do ((previous nil current)
+               (current node (case (compare key (bstree-key current))
+                               (:less (bstree-left current))
+                               (:equal nil)
+                               (:greater (bstree-right current)))))
+              ((null current) (let ((cmp (compare key (bstree-key previous))))
+                                (unless (eq cmp :equal)
+                                  (let ((new-leaf (make-leaf key val)))
+                                    (case cmp
+                                      (:less (setf (bstree-left previous) new-leaf))
+                                      (:greater (setf (bstree-right previous) new-leaf)))))
+                                node)))
           node)
       (make-leaf key val)))
 
