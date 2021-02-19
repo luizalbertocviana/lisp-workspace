@@ -136,6 +136,34 @@
                (:less (treat (avltree-left current-parent)))
                (:greater (treat (avltree-right current-parent))))))))))
 
+(defun transform-node (node)
+  "transforms a bstree node into an avltree node"
+  (if (avltree-p node)
+      node
+      (bstree::with-node node
+          (key val left right)
+        (make-avltree :key key
+                      :val val
+                      :left left
+                      :right right))))
+
+(defun transform-node-with-key (node key)
+  "transforms a bstree node with key into an avltree node"
+  (do ((parent nil previous)
+       (previous nil current)
+       (current node (case (compare key (bstree::bstree-key current))
+                       (:less (avltree-left current))
+                       (:equal nil)
+                       (:greater (avltree-right current)))))
+      ((null current)
+       (if (null parent)
+           (transform-node node)
+           (macrolet ((treat (place)
+                        `(setf ,place (transform-node ,place))))
+             (case (compare key (avltree-key parent))
+               (:less (treat (avltree-left parent)))
+               (:greater (treat (avltree-right parent))))
+             node)))))
 
 (defun transform (node)
   "recursively transforms a bstree node into an (nonbalanced) avltree
