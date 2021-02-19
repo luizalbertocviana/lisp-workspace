@@ -42,9 +42,8 @@
 (defun update-height (node)
   "updates height of node"
   (when (avltree-p node)
-    (with-node node
-        (key val left right height)
-      (setf height (calculate-height node)))))
+    (setf (avltree-height node)
+          (calculate-height node))))
 
 (defun balance-factor (node)
   "calculates balance factor of node, returning one of:
