@@ -127,30 +127,33 @@ node"
   "removes key val pair from bstree rooted at node, returning values
 of modified node and key of parent who had a child removed"
   (if (bstree-p node)
-      (with-node node
-          (node-key val left right)
-        (case (compare key node-key)
-          ;; this function may make a recursive call. If it does, such
-          ;; a call returns exactly one value iff it deletes its
-          ;; node. This way, if subtree-key is nil, we know that node
-          ;; had a child deleted; otherwise, removal may have taken
-          ;; place deep down in the tree. Thus, (or subtree-key
-          ;; node-key) evaluates to the key of a parent who had a
-          ;; child removed
-          (:less    (multiple-value-bind (modified-left subtree-key) (remove left key)
-                      (values (new-node-from node :left modified-left)
-                              (or subtree-key node-key))))
-          (:greater (multiple-value-bind (modified-right subtree-key) (remove right key)
-                      (values (new-node-from node :right modified-right)
-                              (or subtree-key node-key))))
-          (:equal   (if (and left right)
-                        (multiple-value-bind (max-left-key max-left-val) (max-key left)
-                          (multiple-value-bind (modified-left subtree-key) (remove left max-left-key)
-                            (values (new-node-from node :key  max-left-key
-                                                        :val  max-left-val
-                                                        :left modified-left)
-                                    (or subtree-key node-key))))
-                        (or left right)))))
+      (with-node current
+          (c-key c-val c-left c-right)
+        (with-node previous
+            (p-key p-val p-left p-right)
+          (do ((parent nil previous)
+               (previous nil current)
+               (current node (case (compare key c-key)
+                               (:less c-left)
+                               (:equal nil)
+                               (:greater c-right))))
+              ((null current)
+               (if (eq (compare key p-key) :equal)
+                   (if (and p-left p-right)
+                       (multiple-value-bind (max-key max-val) (max-key p-left)
+                         (setf p-key max-key)
+                         (setf p-val max-val)
+                         (setf p-left (remove p-left max-key))
+                         node)
+                       (let ((nonempty-child (or p-left p-right)))
+                         (if parent
+                             (progn
+                               (case (compare p-key (bstree-key parent))
+                                 (:less (setf (bstree-left parent) nonempty-child))
+                                 (:greater (setf (bstree-right parent) nonempty-child)))
+                               node)
+                             nonempty-child)))
+                   node)))))
       node))
 
 (defmacro insertf (place key val)
