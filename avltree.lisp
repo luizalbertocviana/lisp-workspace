@@ -185,7 +185,7 @@ node"
 (defun make-leaf (key val)
   "returns a avltree node containing key and val, with empty left and
 right subtrees"
-  (transform (bstree:make-leaf key val)))
+  (transform-node (bstree:make-leaf key val)))
 
 (defun insert (node key val)
   "inserts key val pair in avltree rooted at node in case key is not
