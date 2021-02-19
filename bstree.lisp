@@ -44,22 +44,6 @@
         (,right (bstree-right ,node)))
      ,@body))
 
-(defmacro new-node-from (node &key (key nil) (val nil) (left nil) (right nil))
-  "creates a new bstree node based on node. Replaces node fields with
-the provided ones"
-  `(make-bstree :key   ,(if key
-                            key
-                            `(bstree-key ,node))
-                :val   ,(if val
-                            val
-                            `(bstree-val ,node))
-                :left  ,(if left
-                            left
-                            `(bstree-left ,node))
-                :right ,(if right
-                            right
-                            `(bstree-right ,node))))
-
 (defmacro recurse-into (func child)
   "makes func recurse into node child.  If child is nil, returns node key val pair as values"
   `(when (bstree-p node)
