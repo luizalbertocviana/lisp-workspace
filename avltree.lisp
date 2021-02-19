@@ -117,17 +117,25 @@
         (otherwise node)))))
 
 (defun rebalance-path-to-key (node key)
-  "recursively rebalances nodes in the path from node to key"
-  (when (avltree-p node)
-    (with-node node
-        (node-key val left right height)
-      (case (compare key node-key)
-        (:less
-         (setf left (rebalance-path-to-key left key)))
-        (:greater
-         (setf right (rebalance-path-to-key right key))))
-      (update-height node)
-      (rebalance node))))
+  "iteratively rebalances nodes in the path from node to key"
+  (when node
+    (do ((parents nil (cons previous parents))
+         (previous nil current)
+         (current node (case (compare key (avltree-key current))
+                         (:less (avltree-left current))
+                         (:equal nil)
+                         (:greater (avltree-right current)))))
+        ((null current)
+         (macrolet ((treat (place)
+                      `(progn (update-height ,place)
+                              (setf ,place (rebalance ,place)))))
+           (do ((bottom-up-parents (rest parents) (rest bottom-up-parents))
+                (current-parent (first parents) (first bottom-up-parents)))
+               ((null current-parent) (treat node))
+             (case (compare key (avltree-key current-parent))
+               (:less (treat (avltree-left current-parent)))
+               (:greater (treat (avltree-right current-parent))))))))))
+
 
 (defun transform (node)
   "recursively transforms a bstree node into an (nonbalanced) avltree
