@@ -46,7 +46,7 @@
 
 (defmacro recurse-into (func child)
   "makes func recurse into node child.  If child is nil, returns node key val pair as values"
-  `(when (bstree-p node)
+  `(when node
      (with-node node
          (key val left right)
        (if ,child
@@ -64,7 +64,7 @@
 (defun lookup (node key)
   "searches for key in bstree rooted at node, returning corresponding
 key and val as values (or nil, in case key is not present)"
-  (when (bstree-p node)
+  (when node
     (with-node node
         (node-key val left right)
       (case (compare key node-key)
@@ -76,71 +76,65 @@ key and val as values (or nil, in case key is not present)"
   "inserts key val pair in bstree rooted at node in case key is not
 present yet"
   (if node
-      (if (bstree-p node)
-          (do ((previous nil current)
-               (current node (case (compare key (bstree-key current))
-                               (:less (bstree-left current))
-                               (:equal nil)
-                               (:greater (bstree-right current)))))
-              ((null current) (let ((cmp (compare key (bstree-key previous))))
-                                (unless (eq cmp :equal)
-                                  (let ((new-leaf (make-leaf key val)))
-                                    (case cmp
-                                      (:less (setf (bstree-left previous) new-leaf))
-                                      (:greater (setf (bstree-right previous) new-leaf)))))
-                                node)))
-          node)
+      (do ((previous nil current)
+           (current node (case (compare key (bstree-key current))
+                           (:less (bstree-left current))
+                           (:equal nil)
+                           (:greater (bstree-right current)))))
+          ((null current) (let ((cmp (compare key (bstree-key previous))))
+                            (unless (eq cmp :equal)
+                              (let ((new-leaf (make-leaf key val)))
+                                (case cmp
+                                  (:less (setf (bstree-left previous) new-leaf))
+                                  (:greater (setf (bstree-right previous) new-leaf)))))
+                            node)))
       (make-leaf key val)))
 
 (defun update (node key new-val)
   "updates key to be attached to new-val, in case key is present in
 node"
-  (if (bstree-p node)
-      (with-node current
-          (current-key current-val left right)
-        (do ((current node (case (compare key current-key)
-                             (:less left)
-                             (:equal (progn
-                                       (setf current-val new-val)
-                                       nil))
-                             (:greater right))))
-            ((null current) node)))
-      node))
+  (with-node current
+      (current-key current-val left right)
+    (do ((current node (case (compare key current-key)
+                         (:less left)
+                         (:equal (progn
+                                   (setf current-val new-val)
+                                   nil))
+                         (:greater right))))
+        ((null current) node))))
 
 (defun remove (node key)
   "removes key val pair from bstree rooted at node, returning values
 of modified node and key of parent who had a child removed"
-  (if (bstree-p node)
-      (with-node current
-          (c-key c-val c-left c-right)
-        (with-node previous
-            (p-key p-val p-left p-right)
-          (do ((parent nil previous)
-               (previous nil current)
-               (current node (case (compare key c-key)
-                               (:less c-left)
-                               (:equal nil)
-                               (:greater c-right))))
-              ((null current)
-               (if (eq (compare key p-key) :equal)
-                   (if (and p-left p-right)
-                       (multiple-value-bind (max-key max-val) (max-key p-left)
-                         (setf p-key max-key)
-                         (setf p-val max-val)
-                         (multiple-value-bind (modified-p-left parent-max-key) (remove p-left max-key)
-                           (setf p-left modified-p-left)
-                           (values node parent-max-key)))
-                       (let ((nonempty-child (or p-left p-right)))
-                         (if parent
-                             (let ((parent-key (bstree-key parent)))
-                               (progn
-                                 (case (compare p-key parent-key)
-                                   (:less (setf (bstree-left parent) nonempty-child))
-                                   (:greater (setf (bstree-right parent) nonempty-child)))
-                                 (values node parent-key)))
-                             nonempty-child)))
-                   node)))))
-      node))
+  (with-node current
+      (c-key c-val c-left c-right)
+    (with-node previous
+        (p-key p-val p-left p-right)
+      (do ((parent nil previous)
+           (previous nil current)
+           (current node (case (compare key c-key)
+                           (:less c-left)
+                           (:equal nil)
+                           (:greater c-right))))
+          ((null current)
+           (if (eq (compare key p-key) :equal)
+               (if (and p-left p-right)
+                   (multiple-value-bind (max-key max-val) (max-key p-left)
+                     (setf p-key max-key)
+                     (setf p-val max-val)
+                     (multiple-value-bind (modified-p-left parent-max-key) (remove p-left max-key)
+                       (setf p-left modified-p-left)
+                       (values node parent-max-key)))
+                   (let ((nonempty-child (or p-left p-right)))
+                     (if parent
+                         (let ((parent-key (bstree-key parent)))
+                           (progn
+                             (case (compare p-key parent-key)
+                               (:less (setf (bstree-left parent) nonempty-child))
+                               (:greater (setf (bstree-right parent) nonempty-child)))
+                             (values node parent-key)))
+                         nonempty-child)))
+               node))))))
 
 (defmacro insertf (place key val)
   "updates place with (insert place key val)"
