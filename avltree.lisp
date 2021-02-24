@@ -4,7 +4,7 @@
   (:use :common-lisp :aliases :macros)
   (:shadow :remove)
   (:import-from :bstree
-     :lookup :empty :compare :max-key :min-key)
+     :lookup :empty :compare :max-key :min-key :update :updatef)
   (:export
      :avltree :avltree-p :make-leaf :empty
      :compare
@@ -208,18 +208,9 @@ present yet"
           node)
       node))
 
-(defun update (node key new-val)
-  "updates key to be attached to new-val, in case key is present in
-node"
-  (transform (bstree:update node key new-val)))
-
 (defmacro insertf (place key val)
   "updates place with (insert place key val)"
   `(setf ,place (insert ,place ,key ,val)))
-
-(defmacro updatef (place key val)
-  "updates place with (insert place key val)"
-  `(setf ,place (update ,place ,key ,val)))
 
 (defmacro removef (place key)
   "updates place with (insert place key val)"
