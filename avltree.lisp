@@ -186,8 +186,7 @@ present yet"
   (if (avltree-p node)
       (if (lookup node key)
           (multiple-value-bind (modified-node parent-key) (bstree:remove node key)
-            (let ((avl-node (transform modified-node)))
-              (rebalance-path-to-key avl-node parent-key)))
+            (rebalance-path-to-key modified-node parent-key))
           node)
       node))
 
