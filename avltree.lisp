@@ -165,23 +165,6 @@
                (:greater (treat (avltree-right parent))))
              node)))))
 
-(defun transform (node)
-  "recursively transforms a bstree node into an (nonbalanced) avltree
-node"
-  (if (avltree-p node)
-      node
-      (when (bstree:bstree-p node)
-        (bstree::with-node node
-          (key val node-left node-right)
-          (let* ((left     (transform node-left))
-                 (right    (transform node-right))
-                 (avl-node (make-avltree :key   key
-                                         :val   val
-                                         :left  left
-                                         :right right)))
-            (update-height avl-node)
-            avl-node)))))
-
 (defun make-leaf (key val)
   "returns a avltree node containing key and val, with empty left and
 right subtrees"
