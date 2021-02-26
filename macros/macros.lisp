@@ -1,5 +1,3 @@
-(modules:using "lists")
-
 (defpackage :macros
   (:use :common-lisp :lists)
   (:export
@@ -122,6 +120,3 @@ can be referenced in both then and else expressions"
   (with-interned-symbols (it)
     `(let ((,it ,condition))
        (if ,it ,then ,else))))
-
-(modules:module "macros")
-(modules:used-by "aliases" "lazy" "avltree" "compiling" "matrix")

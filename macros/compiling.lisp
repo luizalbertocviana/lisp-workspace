@@ -1,5 +1,3 @@
-(modules:using "macros")
-
 (defpackage :compiling
   (:use :common-lisp :macros)
   (:export
@@ -67,5 +65,3 @@ remaining ones are pairs of types and input variables. &rest,
     `(defun ,name ,vars ,doc
        (with-types ,type-vars
          (the ,returns (progn ,@body))))))
-
-(modules:module "compiling")
