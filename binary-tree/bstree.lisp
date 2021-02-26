@@ -1,5 +1,3 @@
-(modules:using "aliases")
-
 (defpackage :bstree
   (:use :common-lisp :aliases)
   (:shadow :remove)
@@ -147,6 +145,3 @@ of modified node and key of parent who had a child removed"
 (defmacro removef (place key)
   "updates place with (remove place key)"
   `(setf ,place (remove ,place ,key)))
-
-(modules:module "bstree")
-(modules:used-by "avltree")

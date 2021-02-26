@@ -1,5 +1,3 @@
-(modules:using "aliases" "bstree" "macros")
-
 (defpackage :avltree
   (:use :common-lisp :aliases :macros)
   (:shadow :remove)
@@ -197,5 +195,3 @@ present yet"
 (defmacro removef (place key)
   "updates place with (insert place key val)"
   `(setf ,place (remove ,place ,key)))
-
-(modules:module "avltree")
