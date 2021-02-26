@@ -16,5 +16,3 @@
   `(eval-when (:compile-toplevel)
      (and ,@(loop for expr in exprs
                   collect `(test ,expr)))))
-
-(modules:module "tests")
