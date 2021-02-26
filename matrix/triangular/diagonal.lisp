@@ -1,5 +1,3 @@
-(modules:using "macros")
-
 (defpackage :triangular-matrix/diagonal
   (:nicknames :mat-diagonal)
   (:use :common-lisp :macros)
@@ -71,5 +69,3 @@
     (incf (aref result i i)
           (* (aref matrix-a i i)
              (aref matrix-b i i)))))
-
-(modules:module "triangular-matrix/diagonal")

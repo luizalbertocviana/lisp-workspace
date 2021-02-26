@@ -1,5 +1,3 @@
-(modules:using "matrix" "triangular-matrix/upper")
-
 (defpackage :triangular-matrix/lower
   (:nicknames :tri-lower)
   (:use :common-lisp)
@@ -158,5 +156,3 @@ stored in matrix-a"
                        (* (aref           matrix-a i k)
                           (tri-upper:aref matrix-b k j))))))
     result))
-
-(modules:module "triangular-matrix/lower")

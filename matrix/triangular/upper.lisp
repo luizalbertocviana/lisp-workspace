@@ -1,5 +1,3 @@
-(modules:using "matrix" "macros")
-
 (defpackage :triangular-matrix/upper
   (:nicknames :tri-upper)
   (:use :common-lisp :macros)
@@ -141,5 +139,3 @@ stored in matrix-a"
                          (* (aref        matrix-a i k)
                             (matrix:aref matrix-b k j))))))
       result)))
-
-(modules:module "triangular-matrix/upper")

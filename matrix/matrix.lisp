@@ -1,5 +1,3 @@
-(modules:using "macros")
-
 (defpackage :matrix
   (:use :common-lisp :macros)
   (:shadow :aref :identity)
@@ -108,5 +106,3 @@ stored in matrix-a"
                             :number-cols (matrix-number-cols matrix-b))))
     (incf-product result matrix-a matrix-b)
     result))
-
-(modules:module "matrix")
