@@ -1,5 +1,3 @@
-(modules:using "aliases" "macros" "lists")
-
 (defpackage :lazy
   (:use :common-lisp :aliases :macros :lists)
   (:shadow
@@ -209,5 +207,3 @@ results as a list"
         (tail  (cdr list))
         (tails (cl:mapcar #'cdr lists)))
     (cons (apply fn head heads) (apply #'mapcar fn tail tails))))
-
-(modules:module "lazy")
