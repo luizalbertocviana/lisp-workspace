@@ -55,6 +55,13 @@
     id))
 
 (defun reduce-two-matrices (op matrix-a matrix-b)
+(defun new-matrix-like (matrix)
+  "creates a new matrix with the same dimensions and element type of
+matrix"
+  (new-matrix :type (matrix-type matrix)
+              :number-rows (matrix-number-rows matrix)
+              :number-cols (matrix-number-cols matrix)))
+
   "reduces matrix-a and matrix-b applying op position-wise. Result is
 stored in matrix-a"
   (dotimes (i (matrix-number-rows matrix-a))
