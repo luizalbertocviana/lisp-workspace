@@ -29,6 +29,11 @@
                :type type
                :dimension dimension))
 
+(defun new-matrix-like (matrix)
+  "creates an upper triangular matrix with same dimension and type of matrix"
+  (new-matrix :type (matrix-type matrix)
+              :dimension (matrix-dimension matrix)))
+
 (defun aref (matrix row col)
   "element of matrix at position (row col)"
   (if (> row col)
