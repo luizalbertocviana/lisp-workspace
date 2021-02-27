@@ -64,23 +64,24 @@
       (setf (aref id i i) (coerce 1 type)))
     id))
 
-(defmacro reduce-with-accessors (op matrix-a matrix-b dimension aref-a aref-b)
+(defmacro reduce-with-accessors (op matrix-a matrix-b aref-a aref-b result)
   "reduces matrix-a and matrix-b applying op position-wise. Result is
-stored in matrix-a. Access to matrices is performed using aref-a and aref-b"
+stored in result. Access to matrices is performed using aref-a and aref-b"
   (with-gensyms (dim i j)
-    `(let ((,dim ,dimension))
+    `(let ((,dim (matrix-dimension ,matrix-a)))
        (dotimes (,i ,dim)
          (loop for ,j from ,i below ,dim
-               do (setf (,aref-a ,matrix-a ,i ,j)
+               do (setf (aref ,result ,i ,j)
                         (funcall ,op
                                  (,aref-a ,matrix-a ,i ,j)
-                                 (,aref-b ,matrix-b ,i ,j)))))
-       ,matrix-a)))
+                                 (,aref-b ,matrix-b ,i ,j))))))))
 
-(defun reduce-two-matrices (op matrix-a matrix-b)
+(defun reduce-two-matrices (op matrix-a matrix-b &key (result nil))
   "reduces matrix-a and matrix-b applying op position-wise. Result is
-stored in matrix-a"
-  (reduce-with-accessors op matrix-a matrix-b (matrix-dimension matrix-a) aref aref))
+stored in result. If result is nil, a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like matrix-a)))
+  (reduce-with-accessors op matrix-a matrix-b aref aref result))
 
 (defun reduce-matrices (op matrix &rest matrices)
   "reduces matrix and matrices applying op position-wise. Result is
