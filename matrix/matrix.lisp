@@ -54,7 +54,6 @@
       (setf (aref id i i) (coerce 1 type)))
     id))
 
-(defun reduce-two-matrices (op matrix-a matrix-b)
 (defun new-matrix-like (matrix)
   "creates a new matrix with the same dimensions and element type of
 matrix"
@@ -62,35 +61,49 @@ matrix"
               :number-rows (matrix-number-rows matrix)
               :number-cols (matrix-number-cols matrix)))
 
+(defun reduce-two-matrices (op matrix-a matrix-b &key (result nil))
   "reduces matrix-a and matrix-b applying op position-wise. Result is
-stored in matrix-a"
+stored in result. If result is nil, a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like matrix-a)))
   (dotimes (i (matrix-number-rows matrix-a))
     (dotimes (j (matrix-number-cols matrix-a))
-      (setf (aref matrix-a i j)
+      (setf (aref result i j)
             (funcall op
                      (aref matrix-a i j)
                      (aref matrix-b i j)))))
-  matrix-a)
+  result)
 
-(defun reduce-matrices-with-reductor (op reductor matrix &rest matrices)
-  "reduces matrix and matrices applying op position-wise using reductor. Result is
-  stored in matrix"
+(defun reduce-matrices-with-reductor (op reductor matrices &key (result nil))
+  "reduces matrices applying op position-wise using reductor. Result
+  is stored in result. If result is nil, a new matrix is allocated"
   (when matrices
-    (reduce (fn2 (funcall reductor op _1 _2)) matrices
-            :initial-value matrix))
-  matrix)
+    (destructuring-bind (first-matrix &rest others) matrices
+      (unless result
+        (setf result (new-matrix-like first-matrix)))
+      (funcall reductor op result first-matrix :result result)
+      (loop for mtx in others
+            do (funcall reductor op result mtx :result result))
+      result)))
 
-(defun reduce-matrices (op matrix &rest matrices)
-  "reduces matrix and matrices applying op position-wise. Result is
-  stored in matrix"
-  (apply #'reduce-matrices-with-reductor op #'reduce-two-matrices matrix matrices))
+(defun reduce-matrices (op matrices &key (result nil))
+  "reduces matrices applying op position-wise. Result is stored in
+  result. If result is nil, a new matrix is allocated"
+  (funcall #'reduce-matrices-with-reductor op #'reduce-two-matrices matrices :result result))
 
-(defun sum (matrix &rest matrices)
-  "sums matrix and matrices, storing result in matrix"
-  (apply #'reduce-matrices #'+ matrix matrices))
+(defun sum (matrices &key (result nil))
+  "sums matrices, storing result in result. If result is nil, a new
+matrix is allocated"
+  (funcall #'reduce-matrices #'+ matrices :result result))
 
-(defun incf-product (result matrix-a matrix-b)
-  "sums to result the product of matrix-a and matrix-b"
+(defun product (matrix-a matrix-b &key (result nil))
+  "sums to result the product of matrix-a and matrix-b. If result is
+nil, a new matrix is allocated"
+  (unless result
+    (setf result
+          (new-matrix :type (matrix-type matrix-a)
+                      :number-rows (matrix-number-rows matrix-a)
+                      :number-cols (matrix-number-cols matrix-b))))
   (dotimes (i (matrix-number-rows matrix-a))
     (dotimes (j (matrix-number-cols matrix-b))
       (dotimes (k (matrix-number-cols matrix-a))
@@ -105,11 +118,7 @@ stored in matrix-a"
   (:documentation "returns product of matrix-a and matrix-b"))
 
 (defmethod add ((matrix-a matrix) (matrix-b matrix))
-  (reduce-two-matrices #'+ (copy-matrix matrix-a) matrix-b))
+  (sum '(matrix-a matrix-b)))
 
 (defmethod multiply ((matrix-a matrix) (matrix-b matrix))
-  (let ((result (new-matrix :type        (matrix-type matrix-a)
-                            :number-rows (matrix-number-rows matrix-a)
-                            :number-cols (matrix-number-cols matrix-b))))
-    (incf-product result matrix-a matrix-b)
-    result))
+  (product matrix-a matrix-b))
