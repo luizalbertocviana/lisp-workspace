@@ -83,14 +83,16 @@ stored in result. If result is nil, a new matrix is allocated"
     (setf result (new-matrix-like matrix-a)))
   (reduce-with-accessors op matrix-a matrix-b aref aref result))
 
-(defun reduce-matrices (op matrix &rest matrices)
-  "reduces matrix and matrices applying op position-wise. Result is
-  stored in matrix"
-  (apply #'matrix::reduce-matrices-with-reductor op #'reduce-two-matrices matrix matrices))
+(defun reduce-matrices (op matrices &key (result nil))
+  "reduces matrices applying op position-wise. If result is nil, a new
+matrix is allocated"
+  (funcall #'matrix::reduce-matrices-with-reductor op #'reduce-two-matrices matrices
+           :result result
+           :allocator-like #'new-matrix-like))
 
-(defun sum (matrix &rest matrices)
-  "sum matrix and matrices, storing result in matrix"
-  (apply #'reduce-matrices #'+ matrix matrices))
+(defun sum (matrices &key (result nil))
+  "sum matrices. If result is nil, a new matrix is allocated"
+  (funcall #'reduce-matrices #'+ matrices :result result))
 
 (defun incf-product (result matrix-a matrix-b)
   "sums to result the product of matrix-a and matrix-b"
