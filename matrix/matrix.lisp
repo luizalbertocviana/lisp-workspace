@@ -74,13 +74,13 @@ stored in result. If result is nil, a new matrix is allocated"
                      (aref matrix-b i j)))))
   result)
 
-(defun reduce-matrices-with-reductor (op reductor matrices &key (result nil))
+(defun reduce-matrices-with-reductor (op reductor matrices &key (result nil) (allocator-like #'new-matrix-like))
   "reduces matrices applying op position-wise using reductor. Result
-  is stored in result. If result is nil, a new matrix is allocated"
+  is stored in result. If result is nil, a new matrix is allocated using allocator-like"
   (when matrices
     (destructuring-bind (first-matrix &rest others) matrices
       (unless result
-        (setf result (new-matrix-like first-matrix)))
+        (setf result (funcall allocator-like first-matrix)))
       (funcall reductor op result first-matrix :result result)
       (loop for mtx in others
             do (funcall reductor op result mtx :result result))
