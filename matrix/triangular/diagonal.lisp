@@ -23,6 +23,11 @@
                :type type
                :dimension dimension))
 
+(defun new-matrix-like (matrix)
+  "creates a diagonal matrix with same dimension and type of matrix"
+  (new-matrix :type (matrix-type matrix)
+              :dimension (matrix-dimension matrix)))
+
 (defun aref (matrix row col)
   "element of matrix at position (row col)"
   (if (= row col)
@@ -41,30 +46,32 @@
               :dimension       dimension
               :initial-element 1))
 
-(defun reduce-two-matrices (op matrix-a matrix-b)
-  "reduces matrix-a and matrix-b applying op position-wise. Result is
-  stored in matrix-a"
+(defun reduce-two-matrices (op matrix-a matrix-b &key (result nil))
+  "reduces matrix-a and matrix-b applying op position-wise. If result
+is nil, a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like matrix-a)))
   (dotimes (i (matrix-dimension matrix-a))
-    (setf (aref matrix-a i i)
+    (setf (aref result i i)
           (funcall op
                    (aref matrix-a i i)
                    (aref matrix-b i i))))
   matrix-a)
 
-(defun reduce-matrices (op matrix &rest matrices)
-  "reduces matrix and matrices applying op position-wise. Result is
-  stored in matrix"
-  (when matrices
-    (reduce (fn2 (funcall #'reduce-two-matrices op _1 _2)) matrices
-            :initial-value matrix))
-  matrix)
+(defun reduce-matrices (op matrices &key (result nil))
+  "reduces matrices applying op position-wise. If result is nil, a new
+matrix is allocated"
+  (matrix::reduce-matrices-with-reductor op #'reduce-two-matrices matrices
+                                         :result result
+                                         :allocator-like #'new-matrix-like))
 
-(defun sum (matrix &rest matrices)
+(defun sum (matrices &key (result nil))
   "sums matrix and matrices, storing result in matrix"
-  (apply #'reduce-matrices #'+ matrix matrices))
+  (reduce-matrices #'+ matrices :result result))
 
-(defun incf-product (result matrix-a matrix-b)
-  "sums to result the product of matrix-a and matrix-b"
+(defun product (matrix-a matrix-b &key (result nil))
+  "sums to result the product of matrix-a and matrix-b. If result is
+nil, a new matrix is allocated"
   (dotimes (i (matrix-dimension matrix-a))
     (incf (aref result i i)
           (* (aref matrix-a i i)

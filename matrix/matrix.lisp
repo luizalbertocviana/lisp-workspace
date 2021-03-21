@@ -78,13 +78,11 @@ stored in result. If result is nil, a new matrix is allocated"
   "reduces matrices applying op position-wise using reductor. Result
   is stored in result. If result is nil, a new matrix is allocated using allocator-like"
   (when matrices
-    (destructuring-bind (first-matrix &rest others) matrices
-      (unless result
-        (setf result (funcall allocator-like first-matrix)))
-      (funcall reductor op result first-matrix :result result)
-      (loop for mtx in others
-            do (funcall reductor op result mtx :result result))
-      result)))
+    (unless result
+      (setf result (funcall allocator-like (first matrices))))
+    (loop for mtx in matrices
+          do (funcall reductor op result mtx :result result))
+    result))
 
 (defun reduce-matrices (op matrices &key (result nil))
   "reduces matrices applying op position-wise. Result is stored in
@@ -109,7 +107,8 @@ nil, a new matrix is allocated"
       (dotimes (k (matrix-number-cols matrix-a))
         (incf (aref result i j)
               (* (aref matrix-a i k)
-                 (aref matrix-b k j)))))))
+                 (aref matrix-b k j))))))
+  result)
 
 (defgeneric add (matrix-a matrix-b)
   (:documentation "returns result of adding matrix-a and matrix-b"))

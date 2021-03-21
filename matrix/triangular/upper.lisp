@@ -8,7 +8,7 @@
      :aref
      :identity
      :reduce-two-matrices :reduce-matrices
-     :incf-product))
+     :product))
 
 (in-package :triangular-matrix/upper)
 
@@ -64,14 +64,14 @@
       (setf (aref id i i) (coerce 1 type)))
     id))
 
-(defmacro reduce-with-accessors (op matrix-a matrix-b aref-a aref-b result)
+(defmacro reduce-with-accessors (op matrix-a matrix-b aref-a aref-b result aref-result)
   "reduces matrix-a and matrix-b applying op position-wise. Result is
 stored in result. Access to matrices is performed using aref-a and aref-b"
   (with-gensyms (dim i j)
     `(let ((,dim (matrix-dimension ,matrix-a)))
        (dotimes (,i ,dim)
          (loop for ,j from ,i below ,dim
-               do (setf (aref ,result ,i ,j)
+               do (setf (,aref-result ,result ,i ,j)
                         (funcall ,op
                                  (,aref-a ,matrix-a ,i ,j)
                                  (,aref-b ,matrix-b ,i ,j))))))))
@@ -81,44 +81,45 @@ stored in result. Access to matrices is performed using aref-a and aref-b"
 stored in result. If result is nil, a new matrix is allocated"
   (unless result
     (setf result (new-matrix-like matrix-a)))
-  (reduce-with-accessors op matrix-a matrix-b aref aref result))
+  (reduce-with-accessors op matrix-a matrix-b aref aref result aref))
 
 (defun reduce-matrices (op matrices &key (result nil))
   "reduces matrices applying op position-wise. If result is nil, a new
 matrix is allocated"
-  (funcall #'matrix::reduce-matrices-with-reductor op #'reduce-two-matrices matrices
-           :result result
-           :allocator-like #'new-matrix-like))
+  (matrix::reduce-matrices-with-reductor op #'reduce-two-matrices matrices
+                                         :result result
+                                         :allocator-like #'new-matrix-like))
 
 (defun sum (matrices &key (result nil))
   "sum matrices. If result is nil, a new matrix is allocated"
-  (funcall #'reduce-matrices #'+ matrices :result result))
+  (reduce-matrices #'+ matrices :result result))
 
-(defun incf-product (result matrix-a matrix-b)
-  "sums to result the product of matrix-a and matrix-b"
+(defun product (matrix-a matrix-b &key (result nil))
+  "sums to result the product of matrix-a and matrix-b. If result is
+nil, a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like matrix-a)))
   (let ((dim (matrix-dimension matrix-a)))
     (dotimes (i dim)
       (loop for j from i below dim
             do (loop for k from i to j
                      do (incf (aref result i j)
                               (* (aref matrix-a i k)
-                                 (aref matrix-b k j))))))))
+                                 (aref matrix-b k j)))))))
+  result)
 
 (defmethod add ((matrix-a matrix) (matrix-b matrix))
-  (reduce-two-matrices #'+ (copy-matrix matrix-a) matrix-b))
+  (reduce-two-matrices #'+ matrix-a matrix-b))
 
 (defmethod add ((matrix-a matrix:matrix) (matrix-b matrix))
   (let ((result (matrix:copy-matrix matrix-a)))
-    (reduce-with-accessors #'+ result matrix-b (matrix-dimension matrix-b) matrix:aref aref)))
+    (reduce-with-accessors #'+ matrix-b matrix-a aref matrix:aref result matrix:aref)))
 
 (defmethod add ((matrix-a matrix) (matrix-b matrix:matrix))
   (add matrix-b matrix-a))
 
 (defmethod multiply ((matrix-a matrix) (matrix-b matrix))
-  (let ((result (new-matrix :type      (matrix-type matrix-a)
-                            :dimension (matrix-dimension matrix-a))))
-    (incf-product result matrix-a matrix-b)
-    result))
+  (product matrix-a matrix-b))
 
 (defmethod multiply ((matrix-a matrix:matrix) (matrix-b matrix))
   (let ((num-rows (matrix:matrix-number-rows matrix-a))

@@ -8,25 +8,35 @@
      :aref
      :identity
      :reduce-two-matrices :reduce-matrices
-     :incf-product))
+     :product))
 
 (in-package :triangular-matrix/lower)
 
 (defstruct (matrix)
   "represents a lower triangular matrix"
-  (data nil :type tri-upper:matrix)
-  (type)
-  (dimension nil :type (integer 0)))
+  (data nil :type tri-upper:matrix))
+
+(defun matrix-dimension (matrix)
+  "returns dimension of matrix"
+  (tri-upper:matrix-dimension (matrix-data matrix)))
+
+(defun matrix-type (matrix)
+  "returns element type of matrix"
+  (tri-upper:matrix-type (matrix-data matrix)))
 
 (defun new-matrix (&key (type 'number) dimension (initial-element 0))
   "creates a lower triangular matrix with elements typed to
   type (defaults to number) and dimension. All positions (except the
   upper triangle) are initialized as initial-element (defaults to 0)"
-  (make-matrix :data (tri-upper:new-matrix :type            type
-                                           :dimension       dimension
-                                           :initial-element initial-element)
-               :type type
-               :dimension dimension))
+  (make-matrix
+   :data (tri-upper:new-matrix :type            type
+                               :dimension       dimension
+                               :initial-element initial-element)))
+
+(defun new-matrix-like (matrix)
+  "creates a lower triangular matrix with same dimension and type of matrix"
+  (new-matrix :type (matrix-type matrix)
+              :dimension (matrix-dimension matrix)))
 
 (defun aref (matrix row col)
   "element of matrix at position (row col)"
@@ -38,38 +48,46 @@
 
 (defun identity (&key (type 'number) dimension)
   "creates an identity matrix"
-  (make-matrix :data (tri-upper:identity :type      type
-                                         :dimension dimension)
-               :type type
-               :dimension dimension))
+  (make-matrix
+   :data (tri-upper:identity :type      type
+                             :dimension dimension)))
 
-(defun reduce-two-matrices (op matrix-a matrix-b)
-  "reduces matrix-a and matrix-b applying op position-wise. Result is
-stored in matrix-a"
+(defun reduce-two-matrices (op matrix-a matrix-b &key (result nil))
+  "reduces matrix-a and matrix-b applying op position-wise. If result
+is nil, a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like matrix-a)))
   (tri-upper:reduce-two-matrices op
                                  (matrix-data matrix-a)
-                                 (matrix-data matrix-b))
-  matrix-a)
+                                 (matrix-data matrix-b)
+                                 :result (matrix-data result))
+  result)
 
-(defun reduce-matrices (op matrix &rest matrices)
-  "reduces matrix and matrices applying op position-wise. Result is
-  stored in matrix"
+(defun reduce-matrices (op matrices &key (result nil))
+  "reduces matrices applying op position-wise. If result is nil,
+a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like (first matrices))))
   (tri-upper:reduce-matrices op
-                             (matrix-data matrix)
-                             (mapcar #'matrix-data matrices)))
+                             (mapcar #'matrix-data matrices)
+                             :result (matrix-data result)))
 
-(defun sum (matrix &rest matrices)
-  "sum matrix and matrices, storing result in matrix"
-  (apply #'reduce-matrices #'+ matrix matrices))
+(defun sum (matrices &key (result nil))
+  "sum matrices. If result is nil, a new matrix is allocated"
+  (reduce-matrices #'+ matrices :result result))
 
-(defun incf-product (result matrix-a matrix-b)
-  "sums to result the product of matrix-a and matrix-b"
-  (tri-upper:incf-product (matrix-data result)
-                          (matrix-data matrix-a)
-                          (matrix-data matrix-b)))
+(defun product (matrix-a matrix-b &key (result nil))
+  "sums to result the product of matrix-a and matrix-b. If result is
+nil, a new matrix is allocated"
+  (unless result
+    (setf result (new-matrix-like matrix-a)))
+  (tri-upper:product (matrix-data matrix-a)
+                     (matrix-data matrix-b)
+                     :result (matrix-data result))
+  result)
 
 (defmethod add ((matrix-a matrix) (matrix-b matrix))
-  (reduce-two-matrices #'+ (copy-matrix matrix-a) matrix-b))
+  (reduce-two-matrices #'+ matrix-a matrix-b))
 
 (defmethod add ((matrix-a tri-upper:matrix) (matrix-b matrix))
   (let* ((dim    (tri-upper:matrix-dimension matrix-a))
@@ -100,10 +118,7 @@ stored in matrix-a"
   (add matrix-b matrix-a))
 
 (defmethod multiply ((matrix-a matrix) (matrix-b matrix))
-  (let ((result (new-matrix :type      (matrix-type matrix-a)
-                            :dimension (matrix-dimension matrix-a))))
-    (incf-product result matrix-a matrix-b)
-    result))
+  (product matrix-a matrix-b))
 
 (defmethod multiply ((matrix-a matrix:matrix) (matrix-b matrix))
   (let ((num-rows (matrix:matrix-number-rows matrix-a))
