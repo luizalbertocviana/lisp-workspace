@@ -11,7 +11,7 @@
     :repeat :cycle
     :to-list :from-list
     :take :drop
-    :enumerate
+    :enumerate :chain
     :consume))
 
 (in-package :iterators)
@@ -84,6 +84,26 @@ enumerating index and the corresponding element of iterator"
                   (setf iterator nil)
                   ending-symbol)
                 (values (incf current-index) element)))
+          ending-symbol))))
+
+(defun chain (iterator-1 iterator-2 &key (ending-symbol :done))
+  "creates an iterator that returns the elememts of iterator-1, and
+when this has ended, returns the elements of iterator-2"
+  (let ((current-iterator iterator-1))
+    (lambda ()
+      (if current-iterator
+          (progn
+            (let ((element (funcall current-iterator)))
+              (when (eq element ending-symbol)
+                (setf current-iterator
+                      (if (eq current-iterator iterator-1)
+                          iterator-2
+                          nil))
+                (setf element
+                      (if current-iterator
+                          (funcall current-iterator)
+                          ending-symbol)))
+              element))
           ending-symbol))))
 
 (defun consume (iterator function &key (ending-symbol :done))
