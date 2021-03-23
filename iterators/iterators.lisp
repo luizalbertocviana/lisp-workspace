@@ -26,22 +26,21 @@ in a loopy manner"
   (let ((reversed-elements nil)
         (elements nil))
     (lambda ()
-      (let ((current (and iterator
-                          (funcall iterator))))
-        (if (or (not current)
-                (eq current ending-symbol))
-            (progn
-              (unless elements
-                (setf iterator nil)
-                (setf elements (nreverse reversed-elements))
-                (setf reversed-elements nil)
-                (make-circular elements))
-              (let ((element (car elements)))
-                (setf elements (cdr elements))
-                element))
-            (progn
-              (push current reversed-elements)
-              current))))))
+      (block :cycle-closure
+        (when iterator
+          (let ((current (funcall iterator)))
+            (if (eq current ending-symbol)
+                (progn
+                  (setf iterator nil)
+                  (setf elements (nreverse reversed-elements))
+                  (setf reversed-elements nil)
+                  (make-circular elements))
+                (progn
+                  (push current reversed-elements)
+                  (return-from :cycle-closure current)))))
+        (let ((element (car elements)))
+          (setf elements (cdr elements))
+          element)))))
 
 (defun to-list (iterator &key (ending-symbol :done))
   "returns a list containing the elements returned by iterator"
