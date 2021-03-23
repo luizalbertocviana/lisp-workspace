@@ -11,6 +11,7 @@
     :repeat :cycle
     :to-list :from-list
     :take :drop
+    :enumerate
     :consume))
 
 (in-package :iterators)
@@ -71,6 +72,20 @@ in a loopy manner"
   (loop repeat n
         do (funcall iterator))
   iterator)
+
+(defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
+  "creates an iterator that returns, at each call, two values: an
+enumerating index and the corresponding element of iterator"
+  (let ((current-index starting-index))
+    (lambda ()
+      (if iterator
+          (let ((element (funcall iterator)))
+            (if (eq element ending-symbol)
+                (progn
+                  (setf iterator nil)
+                  ending-symbol)
+                (values (incf current-index) element)))
+          ending-symbol))))
 
 (defun consume (iterator function &key (ending-symbol :done))
   "consumes each element of iterator, calling function on each of
