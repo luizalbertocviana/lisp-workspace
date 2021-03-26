@@ -10,7 +10,7 @@
   (:export
     :repeat :cycle
     :to-list :from-list
-    :take :drop
+    :take :drop :take-while :drop-while
     :enumerate :chain
     :consume))
 
@@ -71,6 +71,33 @@ in a loopy manner"
   (loop repeat n
         do (funcall iterator))
   iterator)
+
+(defun take-while (predicate iterator &key (ending-symbol :done))
+  "creates an iterator that returns the first elements of iterator
+that satisfy predicate"
+  (lambda ()
+    (if iterator
+        (let ((element (funcall iterator)))
+          (if (funcall predicate element)
+              element
+              (progn
+                (setf iterator nil)
+                ending-symbol)))
+        ending-symbol)))
+
+(defun drop-while (predicate iterator)
+  "discards the first elements of iterator that do not satisfy
+predicate, then returns it"
+  (let ((first-element (loop for element = (funcall iterator)
+                             while (funcall predicate element)
+                             finally (return element)))
+        (first-call t))
+    (lambda ()
+      (if first-call
+          (progn
+            (setf first-call nil)
+            first-element)
+          (funcall iterator)))))
 
 (defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
   "creates an iterator that returns, at each call, two values: an
