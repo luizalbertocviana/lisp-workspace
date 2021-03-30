@@ -11,6 +11,7 @@
     :repeat :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
+    :filter
     :enumerate :chain
     :consume))
 
@@ -98,6 +99,19 @@ predicate, then returns it"
             (setf first-call nil)
             first-element)
           (funcall iterator)))))
+(defun filter (predicate iterator &key (ending-symbol :done))
+  "creates an iterator that consumes iterator, returning the elements
+satisfying predicate"
+  (lambda ()
+    (if iterator
+        (do ((element (funcall iterator) (funcall iterator)))
+            ((or (eq element ending-symbol)
+                 (funcall predicate element))
+             (progn
+               (when (eq element ending-symbol)
+                 (setf iterator nil))
+               element)))
+        ending-symbol)))
 
 (defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
   "creates an iterator that returns, at each call, two values: an
