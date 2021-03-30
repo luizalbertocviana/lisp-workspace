@@ -86,19 +86,24 @@ that satisfy predicate"
                 ending-symbol)))
         ending-symbol)))
 
-(defun drop-while (predicate iterator)
+(defun drop-while (predicate iterator &key (ending-symbol :done))
   "discards the first elements of iterator that do not satisfy
 predicate, then returns it"
-  (let ((first-element (loop for element = (funcall iterator)
-                             while (funcall predicate element)
-                             finally (return element)))
+  (let ((first-element
+          (do ((element (funcall iterator) (funcall iterator)))
+              ((or (eq element ending-symbol)
+                   (not (funcall predicate element)))
+               element)))
         (first-call t))
-    (lambda ()
-      (if first-call
-          (progn
-            (setf first-call nil)
-            first-element)
-          (funcall iterator)))))
+    (if (eq first-element ending-symbol)
+        (repeat ending-symbol)
+        (lambda ()
+          (if first-call
+              (progn
+                (setf first-call nil)
+                first-element)
+              (funcall iterator))))))
+
 (defun filter (predicate iterator &key (ending-symbol :done))
   "creates an iterator that consumes iterator, returning the elements
 satisfying predicate"
