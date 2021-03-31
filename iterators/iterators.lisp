@@ -11,7 +11,7 @@
     :repeat :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
-    :filter
+    :filter :span
     :enumerate :chain
     :consume))
 
@@ -117,6 +117,33 @@ satisfying predicate"
                  (setf iterator nil))
                element)))
         ending-symbol)))
+
+(defun span (predicate iterator &key (ending-symbol :done))
+  "creates two iterators: the first one returns the elements of
+iterator that satisfy predicate, whereas the second one returns the
+elements of iterator that do not satisfy predicate"
+  (let ((queue-yes (queue:new))
+        (queue-no (queue:new)))
+    (macrolet ((do-loop (target-queue stop-condition)
+                 `(do ((element (funcall iterator) (funcall iterator)))
+                     ((or (eq element ending-symbol)
+                          ,stop-condition)
+                      (progn (when (eq element ending-symbol)
+                               (setf iterator nil))
+                             element))
+                   (queue:enqueue ,target-queue element))))
+      (values (lambda ()
+                (if (queue:empty? queue-yes)
+                    (if iterator
+                        (do-loop queue-no (funcall predicate element))
+                        ending-symbol)
+                    (queue:dequeue queue-yes)))
+              (lambda ()
+                (if (queue:empty? queue-no)
+                    (if iterator
+                        (do-loop queue-yes (not (funcall predicate element)))
+                        ending-symbol)
+                    (queue:dequeue queue-no)))))))
 
 (defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
   "creates an iterator that returns, at each call, two values: an
