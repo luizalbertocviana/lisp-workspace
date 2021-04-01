@@ -12,6 +12,7 @@
     :to-list :from-list
     :take :drop :take-while :drop-while
     :filter :partition
+    :split
     :enumerate :chain
     :consume))
 
@@ -144,6 +145,39 @@ elements of iterator that do not satisfy predicate"
                         (do-loop queue-yes (not (funcall predicate element)))
                         ending-symbol)
                     (queue:dequeue queue-no)))))))
+
+(defun split (iterator &key (ending-symbol :done))
+  "creates two iterators, which return the elements of iterator in an
+interleaved way"
+  (let ((queue-even (queue:new))
+        (queue-odd (queue:new)))
+    (values (lambda ()
+              (if (queue:empty? queue-even)
+                  (if iterator
+                      (let ((even (funcall iterator)))
+                        (if (eq even ending-symbol)
+                            (setf iterator nil)
+                            (let ((odd (funcall iterator)))
+                              (if (eq odd ending-symbol)
+                                  (setf iterator nil)
+                                  (queue:enqueue queue-odd odd))))
+                        even)
+                      ending-symbol)
+                  (queue:dequeue queue-even)))
+            (lambda ()
+              (if (queue:empty? queue-odd)
+                  (if iterator
+                      (let ((even (funcall iterator)))
+                        (if (eq even ending-symbol)
+                            (progn (setf iterator nil)
+                                   ending-symbol)
+                            (let ((odd (funcall iterator)))
+                              (queue:enqueue queue-even even)
+                              (when (eq odd ending-symbol)
+                                (setf iterator nil))
+                              odd)))
+                      ending-symbol)
+                  (queue:dequeue queue-odd))))))
 
 (defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
   "creates an iterator that returns, at each call, two values: an
