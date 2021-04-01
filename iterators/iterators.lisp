@@ -11,7 +11,7 @@
     :repeat :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
-    :filter :span
+    :filter :partition
     :enumerate :chain
     :consume))
 
@@ -118,7 +118,7 @@ satisfying predicate"
                element)))
         ending-symbol)))
 
-(defun span (predicate iterator &key (ending-symbol :done))
+(defun partition (predicate iterator &key (ending-symbol :done))
   "creates two iterators: the first one returns the elements of
 iterator that satisfy predicate, whereas the second one returns the
 elements of iterator that do not satisfy predicate"
