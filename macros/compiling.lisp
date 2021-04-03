@@ -66,7 +66,11 @@ expands to
                    `((and ,@(loop for (type var) in typed-vars
                                   collect `(typep ,var ',type)))
                      (locally
-                         (declare (optimize (speed 3) (safety 0) (debug 0))
+                         (declare (optimize (speed             3)
+                                            (safety            0)
+                                            (debug             0)
+                                            (space             0)
+                                            (compilation-speed 0))
                                   ,@(loop for (type var) in typed-vars
                                           collect `(type ,type ,var)))
                        (the ,return-type (progn ,@modified-body)))))))))
