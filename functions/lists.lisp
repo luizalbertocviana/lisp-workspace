@@ -2,7 +2,8 @@
   (:use :common-lisp)
   (:export
     :pairs :maptree :map-sexp
-    :make-circular))
+    :make-circular
+    :take :drop))
 
 (in-package :lists)
 
@@ -42,3 +43,16 @@ circular, this function never returns"
   (let ((last-cons (last list)))
     (setf (cdr last-cons) list)
     list))
+
+(defun take (n list)
+  "takes the first n elements of list"
+  (if (= n 0)
+      nil
+      (cons (car list)
+            (take (1- n) (cdr list)))))
+
+(defun drop (n list)
+  "drops the first n elements of list"
+  (if (= n 0)
+      list
+      (drop (1- n) (cdr list))))
