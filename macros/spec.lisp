@@ -11,7 +11,8 @@
              (debug             0)
              (space             0)
              (compilation-speed 0))
-  "tuple to be used in (declare ...) forms to indicate optimization settings")
+  "tuple to be used in (declare ...) forms to indicate extreme
+optimization settings")
 
 (cl:defun let? (form)
   "determines whether form is a let-form"
