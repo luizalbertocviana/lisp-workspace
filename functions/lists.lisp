@@ -2,7 +2,8 @@
   (:use :common-lisp)
   (:export
     :pairs :maptree :map-sexp
-    :make-circular))
+    :make-circular
+    :take :drop))
 
 (in-package :lists)
 
@@ -22,15 +23,19 @@ transformed by f"
          (let ((first (car tree)) (second (cdr tree)))
            (cons (maptree f first) (maptree f second))))))
 
-(defun map-sexp (f sexp)
+(defun map-sexp (f sexp &key (copy nil))
   "returns a sexp whose sub-expressions (including sexp) are modified by f"
   (let ((modified (funcall f sexp)))
-    (when (consp modified)
-      (setf (car modified)
-            (map-sexp f (car modified)))
-      (setf (cdr modified)
-            (map-sexp f (cdr modified))))
-    modified))
+    (if (consp modified)
+        (let ((modified-car (map-sexp f (car modified) :copy copy))
+              (modified-cdr (map-sexp f (cdr modified) :copy copy)))
+          (if copy
+              (cons modified-car modified-cdr)
+              (progn
+                (setf (car modified) modified-car)
+                (setf (cdr modified) modified-cdr)
+                modified)))
+        modified)))
 
 (defun make-circular (list)
   "destructively turns list into a circular list. If list is already
@@ -38,3 +43,16 @@ circular, this function never returns"
   (let ((last-cons (last list)))
     (setf (cdr last-cons) list)
     list))
+
+(defun take (n list)
+  "takes the first n elements of list"
+  (if (= n 0)
+      nil
+      (cons (car list)
+            (take (1- n) (cdr list)))))
+
+(defun drop (n list)
+  "drops the first n elements of list"
+  (if (= n 0)
+      list
+      (drop (1- n) (cdr list))))
