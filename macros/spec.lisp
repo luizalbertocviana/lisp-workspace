@@ -75,15 +75,24 @@ typed-vars, verifying which of those are bound by let-form"
                                       typed-vars)))
     (put-decl-let let-form (create-type-declaration bound-locals))))
 
-(cl:defun put-type-decl-all-lets (body typed-vars)
+(cl:defun modify-all-lets (body typed-bindings)
   "inserts a (declare (type ...)) form into every let form of body
 according to typed-vars, verifying which of those are bound by each
 let form"
-  (lists:map-sexp (lambda (sexp)
-                    (if (let? sexp)
-                        (put-type-decl-let sexp typed-vars)
-                        sexp))
-                  body))
+  (let ((typed-vars (mapcar (lambda (tb)
+                              (lists:take 2 tb))
+                            typed-bindings))
+        (new-bindings (mapcar (lambda (tb)
+                                (lists:drop 1 tb))
+                              typed-bindings)))
+    (lists:map-sexp (lambda (sexp)
+                      (if (let? sexp)
+                          (progn
+                            (setf sexp (update-let-bindings sexp new-bindings))
+                            (put-type-decl-let sexp typed-vars))
+                          sexp))
+                    body
+                    :copy t)))
 
 (cl:defun create-type-tuples (typed-vars)
   "creates (type ...) tuples to a (declare ...) form according to typed-vars"
@@ -97,7 +106,7 @@ let form"
 (cl:defun create-optimized-body (body return-type typed-vars typed-locals)
   "creates a (locally ...) form equivalent to body, optimized
 according to typed-vars, typed-locals and return-type"
-  (let ((modified-body (put-type-decl-all-lets body typed-locals)))
+  (let ((modified-body (modify-all-lets body typed-locals)))
     `(locally
          (declare ,+agressive-optimize-tuple+
                   ,@(create-type-tuples typed-vars))
