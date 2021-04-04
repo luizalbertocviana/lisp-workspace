@@ -26,6 +26,39 @@ optimization settings")
                        (and (listp binding)
                             (= (length binding) 2))) bindings)))))
 
+(cl:defun change-binding (binding new-val)
+  "changes initial value of binding to new-val"
+  `(,(car binding) ,new-val))
+
+(cl:defun find-binding (bindings var)
+  "returns binding of variable var present in bindings. In case no
+such binding exists, returns nil"
+  (find-if (lambda (binding)
+             (eq var (first binding)))
+           bindings))
+
+(cl:defun bindings-single-change (bindings var new-val)
+  "changes bindings so var is initilized with new-val. In case
+bindings does not contain a binding for var, itis returned
+unmodified"
+  (let ((target-binding (find-binding bindings var)))
+    (when target-binding
+      (setf (second target-binding) new-val))
+    bindings))
+
+(cl:defun bindings-multiple-changes (bindings vars-vals)
+  "changes bindings according to vars-vals"
+  (loop for (var new-val) in vars-vals
+        do (setf bindings
+                 (bindings-single-change bindings var new-val)))
+  bindings)
+
+(cl:defun update-let-bindings (let-form vars-vals)
+  "creates a new let form based on let-form with bindings updated
+according to vars-vals"
+  (destructuring-bind (let-type bindings &body body) let-form
+    `(,let-type ,(bindings-multiple-changes bindings vars-vals) ,@body)))
+
 (cl:defun put-decl-let (let-form declaration)
   "inserts declaration in let-form"
   (destructuring-bind (let-type bindings &body body) let-form
