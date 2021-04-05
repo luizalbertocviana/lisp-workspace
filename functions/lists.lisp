@@ -2,6 +2,7 @@
   (:use :common-lisp)
   (:export
     :pairs :maptree :map-sexp
+    :copy-sexp
     :make-circular
     :take :drop))
 
@@ -36,6 +37,10 @@ transformed by f"
                 (setf (cdr modified) modified-cdr)
                 modified)))
         modified)))
+
+(defun copy-sexp (sexp)
+  "returns a copy of sexp"
+  (map-sexp #'identity sexp :copy t))
 
 (defun make-circular (list)
   "destructively turns list into a circular list. If list is already
