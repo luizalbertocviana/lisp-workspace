@@ -126,6 +126,46 @@ version of body built according to tagged-spec"
     `(,tag ,(create-optimized-body body return-type typed-vars locals))))
 
 (defmacro defun-tag (name lambda-list (&rest tagged-specs) &body body)
+  "defines a function named name with lambda-list as signature. An
+additional &key argument (tag :default) is providded. Each tagged-spec
+has the form (tag (return-type ((type sig-var) ...)  :locals ((type
+local-var init-val) ...))).  For each tagged-spec, an optimized
+version of body is created according to the type information
+provided. Execution is directed to the corresponding version of body,
+according to the tag argument received. In case :default or no tag is
+passed, an unoptimized version of body is executed. For instance,
+(spec:defun-tag add-one (x)
+    ((:fixnum (fixnum ((fixnum x))
+              :locals ((fixnum a 1))))
+     (:single-float (single-float ((single-float x))
+                    :locals ((single-float a 1.0)))))
+  (let ((a 1))
+    (+ x a)))
+expands to
+(defun add-one (x &key (tag :default))
+  (case tag
+    (:fixnum
+     (locally
+         (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)
+                            (compilation-speed 0))
+                  (type fixnum x))
+       (the fixnum
+            (progn (let ((a 1))
+                     (declare (type fixnum a))
+                     (+ x a))))))
+    (:single-float
+     (locally
+         (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)
+                            (compilation-speed 0))
+                  (type single-float x))
+       (the single-float
+            (progn (let ((a 1.0))
+                     (declare (type single-float a))
+                     (+ x a))))))
+    (:default
+     (let ((a 1))
+       (+ x a)))))
+"
   (let ((modified-lambda-list (append lambda-list
                                       (if (member '&key lambda-list)
                                           '((tag :default))
