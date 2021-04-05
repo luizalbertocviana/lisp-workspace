@@ -1,7 +1,7 @@
 (defpackage :spec
   (:use :common-lisp)
   (:shadow :defun)
-  (:export :defun :defun-tag))
+  (:export :defun-tag))
 
 (in-package :spec)
 
@@ -145,43 +145,3 @@ version of body built according to tagged-spec"
                ,@(loop for tagged-spec in tagged-specs
                        collect (treat-tagged-spec tagged-spec expanded-body))
                (:default ,@body)))))))
-
-(defmacro defun (name lambda-list (&rest specs) &body body)
-  "defines a function named name with lambda-list as signature.
-Each spec has the form (return-type ((type sig-var) ...)
-:locals ((type local-var) ...)).  For each spec, the types of argument
-values are checked at runtime, and execution is directed to a
-corresponding optimized version of body. In case no spec is met, an
-unoptimized versoin of body is used. For instance, 
-(spec:defun add-one (x)
-    ((fixnum ((fixnum x)) :locals ((fixnum a))))
-  (let ((a 1))
-    (+ x a)))
-expands to
-(defun add-one (x)
-  (cond
-    ((and (typep x 'fixnum))
-     (locally
-         (declare (optimize (speed 3) (safety 0) (debug 0))
-                  (type fixnum x))
-       (the fixnum
-            (progn
-              (let ((a 1))
-                (declare (type fixnum a))
-                (+ x a))))))
-    (t
-     (let ((a 1))
-       (+ x a)))))
-"
-  (if (stringp (first body))
-      (let ((expanded-body (mapcar #'sb-cltl2:macroexpand-all (rest body))))
-        `(cl:defun ,name ,lambda-list
-           ,(first body)
-           (cond ,@(loop for spec in specs
-                         collect (treat-spec spec expanded-body))
-                 (t ,@(rest body)))))
-      (let ((expanded-body (mapcar #'sb-cltl2:macroexpand-all body)))
-        `(cl:defun ,name ,lambda-list
-           (cond ,@(loop for spec in specs
-                         collect (treat-spec spec expanded-body))
-                 (t ,@body))))))
