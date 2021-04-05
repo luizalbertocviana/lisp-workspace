@@ -36,14 +36,15 @@ such binding exists, returns nil"
              (eq var (first binding)))
            bindings))
 
-(cl:defun bindings-single-change (bindings var new-val)
+(defun bindings-single-change (bindings var new-val)
   "changes bindings so var is initilized with new-val. In case
 bindings does not contain a binding for var, itis returned
 unmodified"
-  (let ((target-binding (find-binding bindings var)))
+  (let* ((copy-bindings (lists:copy-sexp bindings))
+         (target-binding (find-binding copy-bindings var)))
     (when target-binding
       (setf (second target-binding) new-val))
-    bindings))
+    copy-bindings))
 
 (defun bindings-multiple-changes (bindings vars-vals)
   "changes bindings according to vars-vals"
