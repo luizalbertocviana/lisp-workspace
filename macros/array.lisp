@@ -3,7 +3,7 @@
 
 (in-package :array)
 
-(defmacro traversal ((arr n &key (unroll 1)) &body body)
+(defun build-traversal-code (arr n body &key (unroll 1))
   (multiple-value-bind (quot rem) (truncate n unroll)
     (let ((remaining-base (- n rem)))
       (with-gensyms (i base)
@@ -20,3 +20,6 @@
                                               (elt (aref ,arr
                                                          ,(+ remaining-base r))))
                               ,@body)))))))
+
+(defmacro traversal ((arr n &key (unroll 1)) &body body)
+  (build-traversal-code arr n body :unroll unroll))
