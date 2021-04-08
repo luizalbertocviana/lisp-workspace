@@ -3,7 +3,7 @@
 
 (in-package :array)
 
-(defun build-traversal-code (arr n body &key (unroll 1))
+(defun build-static-traversal-code (arr n body &key (unroll 1))
   (multiple-value-bind (quot rem) (truncate n unroll)
     (let ((remaining-base (- n rem)))
       (with-gensyms (i base)
