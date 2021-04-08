@@ -23,3 +23,23 @@
 
 (defmacro traversal ((arr n &key (unroll 1)) &body body)
   (build-traversal-code arr n body :unroll unroll))
+(defun build-dynamic-traversal-code (arr n body &key (unroll 1))
+  (let ((exec-lambda-body `(funcall (lambda () ,@body))))
+   (with-gensyms (once-n quot rem base remaining-base i r)
+    `(let ((,once-n ,n))
+       (multiple-value-bind (,quot ,rem) (truncate ,once-n ,unroll)
+         (let ((,base 0)
+               (,remaining-base (- ,once-n ,rem)))
+           (dotimes (,i ,quot)
+             ,@(loop for offset from 0 to (1- unroll)
+                     collect `(symbol-macrolet ((idx (+ ,base ,offset))
+                                                (elt (aref ,arr
+                                                           (+ ,base ,offset))))
+                                ,exec-lambda-body))
+             (incf ,base ,unroll))
+           (dotimes (,r ,rem)
+             (symbol-macrolet ((idx (+ ,remaining-base ,r))
+                               (elt (aref ,arr
+                                          (+ ,remaining-base ,r))))
+               ,exec-lambda-body))))))))
+
