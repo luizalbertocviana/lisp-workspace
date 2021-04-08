@@ -21,8 +21,6 @@
                                                          ,(+ remaining-base r))))
                               ,@body)))))))
 
-(defmacro traversal ((arr n &key (unroll 1)) &body body)
-  (build-traversal-code arr n body :unroll unroll))
 (defun build-dynamic-traversal-code (arr n body &key (unroll 1))
   (let ((exec-lambda-body `(funcall (lambda () ,@body))))
    (with-gensyms (once-n quot rem base remaining-base i r)
@@ -43,3 +41,12 @@
                                           (+ ,remaining-base ,r))))
                ,exec-lambda-body))))))))
 
+(defmacro traversal ((arr &key (length `(length ,arr)) (unroll 2 unroll-p)) &body body)
+  (if (integerp length)
+      (build-static-traversal-code arr length body
+                                   :unroll (if unroll-p
+                                               unroll
+                                               (if (<= length 11) ; generates nice asm code
+                                                   (+ length 1)
+                                                   2)))
+      (build-dynamic-traversal-code arr length body :unroll unroll)))
