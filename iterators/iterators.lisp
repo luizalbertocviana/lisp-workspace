@@ -23,6 +23,15 @@
   "creates an iterator which always returns element"
   (lambda () element))
 
+(defun iterate (function element)
+  "returns element and the results of successively applying function to it"
+  (let ((previous nil)
+        (current element))
+    (lambda ()
+      (setf previous current)
+      (setf current (funcall function current))
+      previous)))
+
 (defun cycle (iterator &key (ending-symbol :done))
   "creates an iterator that returns the elements returned by iterator
 in a loopy manner"
