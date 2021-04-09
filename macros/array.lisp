@@ -1,5 +1,6 @@
 (defpackage :array
-  (:use :common-lisp :macros))
+  (:use :common-lisp :macros)
+  (:export :traversal))
 
 (in-package :array)
 
