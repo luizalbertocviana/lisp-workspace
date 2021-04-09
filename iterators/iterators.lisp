@@ -46,7 +46,7 @@ in a loopy manner"
                   (setf iterator nil)
                   (setf elements (nreverse reversed-elements))
                   (setf reversed-elements nil)
-                  (make-circular elements))
+                  (lists:make-circular elements))
                 (progn
                   (push current reversed-elements)
                   (return-from :cycle-closure current)))))
