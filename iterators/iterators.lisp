@@ -6,13 +6,14 @@
 ;; here we provide some functions that create useful iterators
 
 (defpackage :iterators
-  (:use :common-lisp :lists)
+  (:use :common-lisp)
+  (:shadow :merge)
   (:export
-    :repeat :cycle
+    :repeat :iterate :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
     :filter :partition
-    :split
+    :split :merge
     :enumerate :chain
     :consume))
 
