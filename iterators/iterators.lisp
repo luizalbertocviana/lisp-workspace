@@ -189,6 +189,24 @@ interleaved way"
                       ending-symbol)
                   (queue:dequeue queue-odd))))))
 
+(defun merge (iterator-1 iterator-2 &key (ending-symbol :done))
+  (lambda ()
+    (if (or iterator-1 iterator-2)
+        (let ((element (funcall (or iterator-1 iterator-2))))
+          (if (eq element ending-symbol)
+              (if iterator-1
+                  (progn
+                    (setf iterator-1 nil)
+                    (rotatef iterator-1 iterator-2)
+                    (when iterator-1
+                      (setf element (funcall iterator-1))
+                      (when (eq element ending-symbol)
+                        (setf iterator-1 nil))))
+                  (setf iterator-2 nil))
+              (rotatef iterator-1 iterator-2))
+          element)
+        ending-symbol)))
+
 (defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
   "creates an iterator that returns, at each call, two values: an
 enumerating index and the corresponding element of iterator"
