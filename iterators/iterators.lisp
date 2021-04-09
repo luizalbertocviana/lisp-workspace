@@ -6,13 +6,14 @@
 ;; here we provide some functions that create useful iterators
 
 (defpackage :iterators
-  (:use :common-lisp :lists)
+  (:use :common-lisp)
+  (:shadow :merge)
   (:export
-    :repeat :cycle
+    :repeat :iterate :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
     :filter :partition
-    :split
+    :split :merge
     :enumerate :chain
     :consume))
 
@@ -21,6 +22,15 @@
 (defun repeat (element)
   "creates an iterator which always returns element"
   (lambda () element))
+
+(defun iterate (function element)
+  "returns element and the results of successively applying function to it"
+  (let ((previous nil)
+        (current element))
+    (lambda ()
+      (setf previous current)
+      (setf current (funcall function current))
+      previous)))
 
 (defun cycle (iterator &key (ending-symbol :done))
   "creates an iterator that returns the elements returned by iterator
@@ -36,7 +46,7 @@ in a loopy manner"
                   (setf iterator nil)
                   (setf elements (nreverse reversed-elements))
                   (setf reversed-elements nil)
-                  (make-circular elements))
+                  (lists:make-circular elements))
                 (progn
                   (push current reversed-elements)
                   (return-from :cycle-closure current)))))
@@ -178,6 +188,24 @@ interleaved way"
                               odd)))
                       ending-symbol)
                   (queue:dequeue queue-odd))))))
+
+(defun merge (iterator-1 iterator-2 &key (ending-symbol :done))
+  (lambda ()
+    (if (or iterator-1 iterator-2)
+        (let ((element (funcall (or iterator-1 iterator-2))))
+          (if (eq element ending-symbol)
+              (if iterator-1
+                  (progn
+                    (setf iterator-1 nil)
+                    (rotatef iterator-1 iterator-2)
+                    (when iterator-1
+                      (setf element (funcall iterator-1))
+                      (when (eq element ending-symbol)
+                        (setf iterator-1 nil))))
+                  (setf iterator-2 nil))
+              (rotatef iterator-1 iterator-2))
+          element)
+        ending-symbol)))
 
 (defun enumerate (iterator &key (starting-index 0) (ending-symbol :done))
   "creates an iterator that returns, at each call, two values: an
