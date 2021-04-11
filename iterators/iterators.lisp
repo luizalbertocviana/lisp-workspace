@@ -15,6 +15,7 @@
     :filter :partition
     :split :merge
     :enumerate :chain
+    :stream-by-line :stream-by-sexp
     :consume))
 
 (in-package :iterators)
@@ -240,6 +241,31 @@ when this has ended, returns the elements of iterator-2"
                           ending-symbol)))
               element))
           ending-symbol))))
+
+(defmacro make-stream-consumer (consuming-function)
+  "intended to be used internally in this package. Creates a lambda
+function form that consumes stream using consuming-function"
+  `(lambda ()
+     (if stream
+         (let ((line (,consuming-function stream nil)))
+           (if line
+               line
+               (progn
+                 (setf stream nil)
+                 ending-symbol)))
+         ending-symbol)))
+
+(defun stream-by-line (stream &key (ending-symbol :done))
+  "creates an iterator that consumes stream line by line, returning a
+line when it is called. When stream has no remaining lines, iterator
+returns ending-symbol"
+  (make-stream-consumer read-line))
+
+(defun stream-by-sexp (stream &key (ending-symbol :done))
+  "creates an iterator that consumes stream sexp by sexp, returning a
+sexp when it is called. When stream has no remaining sexps, iterator
+returns ending-symbol"
+  (make-stream-consumer read))
 
 (defun consume (iterator function &key (ending-symbol :done))
   "consumes each element of iterator, calling function on each of
