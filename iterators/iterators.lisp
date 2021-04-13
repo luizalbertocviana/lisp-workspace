@@ -7,16 +7,18 @@
 
 (defpackage :iterators
   (:use :common-lisp)
-  (:shadow :merge)
+  (:import-from :macros :let-values*)
+  (:shadow :merge :map)
   (:export
     :repeat :iterate :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
+    :map
     :filter :partition
     :split :merge
     :enumerate :chain
     :stream-by-line :stream-by-sexp
-    :consume))
+    :consume :with-iterators))
 
 (in-package :iterators)
 
@@ -115,6 +117,17 @@ predicate, then returns it"
                 (setf first-call nil)
                 first-element)
               (funcall iterator))))))
+
+(defun map (function iterator &key (ending-symbol :done))
+  (lambda ()
+    (if iterator
+        (let ((element (funcall iterator)))
+          (if (eq element ending-symbol)
+              (progn
+                (setf iterator nil)
+                ending-symbol)
+              (funcall function element)))
+        ending-symbol)))
 
 (defun filter (predicate iterator &key (ending-symbol :done))
   "creates an iterator that consumes iterator, returning the elements
@@ -267,9 +280,34 @@ sexp when it is called. When stream has no remaining sexps, iterator
 returns ending-symbol"
   (make-stream-consumer read))
 
+(defmacro with-iterators (bindings &body body)
+  "binding is an expression (iterator ... iterators-form). Performs
+bindings such that each iterator-form can refer to a previously bound
+iterator, then performs body in a context where iterator is
+interpreted as (funcall iterator)"
+  (let* ((bindings-vars (mapcar #'butlast bindings))
+         (all-vars (apply #'concatenate 'list bindings-vars))
+         (all-vars-gensyms (loop for var in all-vars
+                                 collect (gensym))))
+    (labels ((replace-var (var g-var bindings)
+               (lists:map-sexp (lambda (sexp)
+                                 (if (eq var sexp)
+                                     g-var
+                                     sexp))
+                               bindings :copy t)))
+      (let ((modified-bindings (loop for bdg = bindings then (replace-var var g-var bdg)
+                                     for var in all-vars
+                                     for g-var in all-vars-gensyms
+                                     finally (return bdg))))
+        `(let-values* ,modified-bindings
+           (symbol-macrolet ,(loop for var in all-vars
+                                   for g-var in all-vars-gensyms
+                                   collect `(,var (funcall ,g-var)))
+             ,@body))))))
+
 (defun consume (iterator function &key (ending-symbol :done))
   "consumes each element of iterator, calling function on each of
 them"
-  (do ((element (funcall iterator) (funcall iterator)))
+  (do ((element #1=(funcall iterator) #1#))
       ((eq element ending-symbol) nil)
     (funcall function element)))
