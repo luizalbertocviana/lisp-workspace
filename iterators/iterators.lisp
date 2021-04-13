@@ -17,7 +17,7 @@
     :split :merge
     :enumerate :chain
     :stream-by-line :stream-by-sexp
-    :consume))
+    :consume :with-iterators))
 
 (in-package :iterators)
 
@@ -278,6 +278,31 @@ returns ending-symbol"
 sexp when it is called. When stream has no remaining sexps, iterator
 returns ending-symbol"
   (make-stream-consumer read))
+
+(defmacro with-iterators (bindings &body body)
+  "binding is an expression (iterator ... iterators-form). Performs
+bindings such that each iterator-form can refer to a previously bound
+iterator, then performs body in a context where iterator is
+interpreted as (funcall iterator)"
+  (let* ((bindings-vars (mapcar #'butlast bindings))
+         (all-vars (apply #'concatenate 'list bindings-vars))
+         (all-vars-gensyms (loop for var in all-vars
+                                 collect (gensym))))
+    (labels ((replace-var (var g-var bindings)
+               (lists:map-sexp (lambda (sexp)
+                                 (if (eq var sexp)
+                                     g-var
+                                     sexp))
+                               bindings :copy t)))
+      (let ((modified-bindings (loop for bdg = bindings then (replace-var var g-var bdg)
+                                     for var in all-vars
+                                     for g-var in all-vars-gensyms
+                                     finally (return bdg))))
+        `(let-values* ,modified-bindings
+           (symbol-macrolet ,(loop for var in all-vars
+                                   for g-var in all-vars-gensyms
+                                   collect `(,var (funcall ,g-var)))
+             ,@body))))))
 
 (defun consume (iterator function &key (ending-symbol :done))
   "consumes each element of iterator, calling function on each of
