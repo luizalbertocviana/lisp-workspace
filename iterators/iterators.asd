@@ -1,5 +1,5 @@
 (defsystem :iterators
   :description "facilities for creating and manipulating iterators"
   :author "Luiz Alberto do Carmo Viana <luizalbertocviana@gmail.com>"
-  :depends-on (:functions :queue)
+  :depends-on (:functions :queue :macros)
   :components ((:file "iterators")))
