@@ -12,6 +12,7 @@
     :repeat :iterate :cycle
     :to-list :from-list
     :take :drop :take-while :drop-while
+    :map
     :filter :partition
     :split :merge
     :enumerate :chain
@@ -115,6 +116,17 @@ predicate, then returns it"
                 (setf first-call nil)
                 first-element)
               (funcall iterator))))))
+
+(defun map (function iterator &key (ending-symbol :done))
+  (lambda ()
+    (if iterator
+        (let ((element (funcall iterator)))
+          (if (eq element ending-symbol)
+              (progn
+                (setf iterator nil)
+                ending-symbol)
+              (funcall function element)))
+        ending-symbol)))
 
 (defun filter (predicate iterator &key (ending-symbol :done))
   "creates an iterator that consumes iterator, returning the elements
