@@ -308,6 +308,6 @@ interpreted as (funcall iterator)"
 (defun consume (iterator function &key (ending-symbol :done))
   "consumes each element of iterator, calling function on each of
 them"
-  (do ((element (funcall iterator) (funcall iterator)))
+  (do ((element #1=(funcall iterator) #1#))
       ((eq element ending-symbol) nil)
     (funcall function element)))
