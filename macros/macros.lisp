@@ -8,7 +8,8 @@
      :for-each
      :compose-predicates
      :not-p :and-p :or-p
-     :aif))
+     :aif
+     :let-values*))
 
 (in-package :macros)
 
@@ -120,3 +121,18 @@ can be referenced in both then and else expressions"
   (with-interned-symbols (it)
     `(let ((,it ,condition))
        (if ,it ,then ,else))))
+
+(defmacro let-values* (bindings &body body)
+  "binding is an expression (var ... values-form). Performs body in a
+context where, for each binding in bindings, var ... is bound to the
+values returned from values-form"
+  (labels ((modify-body (binding)
+             (let ((vars (butlast binding))
+                   (values-form (car (last binding))))
+               (setf body
+                     `(multiple-value-bind ,vars ,values-form
+                        ,body)))))
+    (setf body `(progn ,@body))
+    (loop for binding in (reverse bindings)
+          do (modify-body binding))
+    body))
