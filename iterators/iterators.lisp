@@ -7,7 +7,8 @@
 
 (defpackage :iterators
   (:use :common-lisp)
-  (:shadow :merge)
+  (:import-from :macros :let-values*)
+  (:shadow :merge :map)
   (:export
     :repeat :iterate :cycle
     :to-list :from-list
