@@ -1,0 +1,33 @@
+; disassembly for ADD-EDGE
+; Size: 112 bytes. Origin: #x52C2AE20                         ; ADD-EDGE
+; 20:       4C8955F8         MOV [RBP-8], R10
+; 24:       4C894DF0         MOV [RBP-16], R9
+; 28:       4C8945E8         MOV [RBP-24], R8
+; 2C:       4883EC10         SUB RSP, 16
+; 30:       498BD0           MOV RDX, R8
+; 33:       498BF9           MOV RDI, R9
+; 36:       498BF2           MOV RSI, R10
+; 39:       B906000000       MOV ECX, 6
+; 3E:       48892C24         MOV [RSP], RBP
+; 42:       488BEC           MOV RBP, RSP
+; 45:       E8D8007DFD       CALL #x503FAF22                  ; #<FDEFN HAS-EDGE>
+; 4A:       4C8B45E8         MOV R8, [RBP-24]
+; 4E:       4C8B4DF0         MOV R9, [RBP-16]
+; 52:       4C8B55F8         MOV R10, [RBP-8]
+; 56:       80FA17           CMP DL, 23
+; 59:       740B             JEQ L0
+; 5B:       BA17011050       MOV EDX, #x50100117              ; NIL
+; 60:       488BE5           MOV RSP, RBP
+; 63:       F8               CLC
+; 64:       5D               POP RBP
+; 65:       C3               RET
+; 66: L0:   498B400D         MOV RAX, [R8+13]
+; 6A:       4883C002         ADD RAX, 2
+; 6E:       4989400D         MOV [R8+13], RAX
+; 72:       498BD0           MOV RDX, R8
+; 75:       498BF9           MOV RDI, R9
+; 78:       498BF2           MOV RSI, R10
+; 7B:       48C745F002000000 MOV QWORD PTR [RBP-16], 2
+; 83:       B908000000       MOV ECX, 8
+; 88:       FF7508           PUSH QWORD PTR [RBP+8]
+; 8B:       E9B2007DFD       JMP #x503FAF42                   ; #<FDEFN SET-EDGE>
