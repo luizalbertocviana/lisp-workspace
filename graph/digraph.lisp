@@ -1,7 +1,10 @@
 (defpackage :digraph
   (:use :common-lisp)
   (:export
-    :digraph :new :has-edge :add-edge :remove-edge))
+    :digraph :empty :complete
+    :num-verts :num-edges
+    :has-edge :add-edge :remove-edge
+    :edge-iterator))
 
 (in-package :digraph)
 
