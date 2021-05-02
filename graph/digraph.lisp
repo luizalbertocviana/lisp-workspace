@@ -14,7 +14,7 @@
   (num-edges 0 :type fixnum)
   (adj #(0) :type (simple-array bit)))
 
-(defun new (num-verts)
+(defun empty (num-verts)
   "creates a new empty digraph with num-verts vertices"
   (make-digraph :num-verts num-verts
                 :num-edges 0
