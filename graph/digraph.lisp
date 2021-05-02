@@ -21,6 +21,14 @@
                 :adj (make-array (* num-verts num-verts)
                                  :element-type 'bit)))
 
+(defun num-verts (digraph)
+  "returns the number of vertices of digraph"
+  (digraph-num-verts digraph))
+
+(defun num-edges (digraph)
+  "returns the number of edges of digraph"
+  (digraph-num-edges digraph))
+
 (defmacro edge (digraph u v)
   "creates code to access the position in the digraph adj bit-vector
 correspondiong to edge (u, v)"
