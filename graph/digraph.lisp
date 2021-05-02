@@ -68,3 +68,20 @@ edge (u, v) to value"
   (when (has-edge digraph u v)
     (decf (digraph-num-edges digraph))
     (set-edge digraph u v 0)))
+
+(defun complete (num-verts &key (loops nil))
+  "creates a new complete digraph with num-verts vertices. Unless
+otherwise stated, the created digraph will not contain loops"
+  (declare (optimize (speed 3) (debug 0) (safety 0) (space 0) (compilation-speed 0))
+           (type fixnum num-verts))
+  (let ((digraph (make-digraph :num-verts num-verts
+                               :num-edges (the fixnum (* num-verts num-verts))
+                               :adj (make-array (the fixnum (* num-verts num-verts))
+                                                :element-type 'bit
+                                                :initial-element 1))))
+    (unless loops
+      (dotimes (i num-verts)
+        (remove-edge digraph i i))
+      (decf (digraph-num-edges digraph) num-verts))
+    digraph))
+
