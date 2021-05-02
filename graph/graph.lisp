@@ -1,7 +1,7 @@
 (defpackage :graph
   (:use :common-lisp)
   (:export
-    :graph :new :has-edge :add-edge :remove-edge))
+    :graph :empty :has-edge :add-edge :remove-edge))
 
 (in-package :graph)
 
@@ -9,9 +9,9 @@
   "representes an undirected graph"
   (digraph nil :type digraph:digraph))
 
-(defun new (num-verts)
+(defun empty (num-verts)
   "creates a new empty graph with num-verts vertices"
-  (make-graph :digraph (digraph:new num-verts)))
+  (make-graph :digraph (digraph:empty num-verts)))
 
 (defmacro adapt-from-digraph (function)
   "generates code to use function with graph"
