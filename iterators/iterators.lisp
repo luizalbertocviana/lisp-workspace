@@ -18,7 +18,7 @@
     :split :merge
     :enumerate :chain
     :stream-by-line :stream-by-sexp
-    :consume :with-iterators))
+    :consume :consume-values :with-iterators))
 
 (in-package :iterators)
 
@@ -311,3 +311,19 @@ them"
   (do ((element #1=(funcall iterator) #1#))
       ((eq element ending-symbol) nil)
     (funcall function element)))
+
+(defmacro consume-values ((binding &key (ending-symbol :done)) &body body)
+  "binding is an expression that can be destructured as (var
+... iterator-expr). When iterator-expr does not return ending-symbol,
+its return values are assigned to var ... and body is executed. When
+iterator-expr returns ending-symbol, this returns nil"
+  (let ((vars (butlast binding))
+        (iterator-expr (car (last binding))))
+    (let ((first-var (first vars))
+          (iteratorg (gensym)))
+      `(let ((,iteratorg ,iterator-expr))
+         (let-values* ((,@vars (funcall ,iteratorg)))
+           (do ()
+               ((eq ,first-var ,ending-symbol) nil)
+             ,@body
+             (multiple-value-setq ,vars (funcall ,iteratorg))))))))
