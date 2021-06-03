@@ -4,7 +4,7 @@
     :digraph :empty :complete
     :num-verts :num-edges
     :has-edge :add-edge :remove-edge
-    :edge-iterator))
+    :edge-iterator :neighbors))
 
 (in-package :digraph)
 
@@ -111,3 +111,11 @@ otherwise stated, the created digraph will not contain loops"
                           ending-symbol
                           (return-edge)))
                    (next))))))))
+
+(defun neighbors (digraph vertex)
+  "returns the list of vertices adjacent to vertex"
+  (do ((i 0 (1+ i))
+       (neighbors nil (if (has-edge digraph vertex i)
+                          (cons i neighbors)
+                          neighbors)))
+      ((= i (num-verts digraph)) neighbors)))
