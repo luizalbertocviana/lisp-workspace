@@ -4,7 +4,8 @@
     :digraph :empty :complete
     :num-verts :num-edges
     :has-edge :add-edge :remove-edge
-    :edge-iterator :neighbors))
+    :edge-iterator
+    :neighbors :neighbor-closure))
 
 (in-package :digraph)
 
@@ -119,3 +120,9 @@ otherwise stated, the created digraph will not contain loops"
                           (cons i neighbors)
                           neighbors)))
       ((= i (num-verts digraph)) neighbors)))
+
+(defun neighbor-closure (digraph)
+  "returns a closure that, given a vertex of digraph, returns a list
+  of its neighbors in digraph"
+  (lambda (vertex)
+    (neighbors digraph vertex)))
