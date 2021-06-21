@@ -24,6 +24,7 @@ adjacency-fn"
   (lambda (vertex)
     (neighbors adjacency-fn vertex)))
 
+(defun depth-first-search (neighbor-fn initial-vertex &key (early-visitor-fn nil) (late-visitor-fn nil))
   "based on the neighbor structure described by neighbor-fn, a
 function that, given a vertex, returns a list of its neighbors,
 performs a depth-first-search starting at initial-vertex, calling
@@ -32,6 +33,8 @@ visitor-fn at the end of each vertex visit"
     (macrolet ((color (vertex)
                  `(gethash ,vertex color-ht :white)))
       (labels ((visit (vertex)
+                 (and early-visitor-fn
+                      (funcall early-visitor-fn vertex))
                  (setf (color vertex) :gray)
                  (visit-neighbors vertex)
                  (finish-visit vertex))
@@ -41,7 +44,8 @@ visitor-fn at the end of each vertex visit"
                          do (when (eq (color neighbor) :white)
                               (visit neighbor)))))
                (finish-visit (vertex)
-                 (funcall visitor-fn vertex)
+                 (and late-visitor-fn
+                      (funcall late-visitor-fn vertex))
                  (setf (color vertex) :black)))
         (visit initial-vertex)))))
 
