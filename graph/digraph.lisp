@@ -5,7 +5,7 @@
     :num-verts :num-edges
     :has-edge :add-edge :remove-edge
     :edge-iterator
-    :neighbors :neighbor-closure))
+    :adjacency-closure))
 
 (in-package :digraph)
 
