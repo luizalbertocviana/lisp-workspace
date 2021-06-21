@@ -5,7 +5,10 @@
 
 (in-package :graph-algorithms)
 
-(defun depth-first-search (neighbor-fn initial-vertex visitor-fn)
+(defun transpose-adjacency-closure (digraph)
+  (lambda (u v)
+    (has-edge digraph v u)))
+
 (defun neighbors (adjacency-fn vertex)
   "returns the list of vertices adjacent to vertex according to
 adjacency-fn"
