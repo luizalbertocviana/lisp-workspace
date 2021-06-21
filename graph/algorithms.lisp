@@ -71,3 +71,23 @@ visitor-fn at the end of each vertex visit"
                        (touch neighbor)))
             (funcall visitor-fn current-vertex)
             (setf (color current-vertex) :black)))))))
+
+(defun strongly-connected-components (neighbor-fn num-verts)
+  (let ((time 0)
+        (start-time-ht (make-hash-table))
+        (finish-time-ht (make-hash-table))
+        (visited-ht (make-hash-table)))
+    (macrolet ((visited (vert)
+                 `(gethash ,vert visited-ht :unvisited)))
+      (labels ((start-visitor (vert)
+                 (setf (visited vert) :visited)
+                 (incf time)
+                 (setf (gethash vert start-time-ht) time))
+               (finish-visitor (vert)
+                 (incf time)
+                 (setf (gethash vert finish-time-ht) time))))
+      (loop for vert from 0 to (1- num-verts)
+            do (when (eq (visited vert) :unvisited)
+                 (graph-algorithms:depth-first-search neighbor-fn vert
+                                                      :early-visitor-fn #'start-visitor
+                                                      :late-visitor-fn #'finish-visitor))))))
