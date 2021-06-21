@@ -82,8 +82,7 @@ otherwise stated, the created digraph will not contain loops"
                                                 :initial-element 1))))
     (unless loops
       (dotimes (i num-verts)
-        (remove-edge digraph i i))
-      (decf (digraph-num-edges digraph) num-verts))
+        (remove-edge digraph i i)))
     digraph))
 
 (defun edge-iterator (digraph &key (ending-symbol :done))
