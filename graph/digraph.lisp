@@ -112,3 +112,8 @@ otherwise stated, the created digraph will not contain loops"
                           (return-edge)))
                    (next))))))))
 
+(defun adjacency-closure (digraph)
+  "returns a closure which receives to vertices u and v as arguments
+and returns whether there is an arc from u to v in digraph"
+  (lambda (u v)
+    (has-edge digraph u v)))
