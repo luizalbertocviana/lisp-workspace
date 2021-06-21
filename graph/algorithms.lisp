@@ -6,6 +6,21 @@
 (in-package :graph-algorithms)
 
 (defun depth-first-search (neighbor-fn initial-vertex visitor-fn)
+(defun neighbors (adjacency-fn vertex)
+  "returns the list of vertices adjacent to vertex according to
+adjacency-fn"
+  (do ((i 0 (1+ i))
+       (neighbors nil (if (funcall adjacency-fn vertex i)
+                          (cons i neighbors)
+                          neighbors)))
+      ((= i (num-verts digraph)) neighbors)))
+
+(defun neighbor-closure (adjacency-fn)
+  "returns a closure that, given a vertex, returns a list
+  of its neighbors according to adjacency-fn"
+  (lambda (vertex)
+    (neighbors adjacency-fn vertex)))
+
   "based on the neighbor structure described by neighbor-fn, a
 function that, given a vertex, returns a list of its neighbors,
 performs a depth-first-search starting at initial-vertex, calling

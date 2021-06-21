@@ -112,16 +112,3 @@ otherwise stated, the created digraph will not contain loops"
                           (return-edge)))
                    (next))))))))
 
-(defun neighbors (digraph vertex)
-  "returns the list of vertices adjacent to vertex"
-  (do ((i 0 (1+ i))
-       (neighbors nil (if (has-edge digraph vertex i)
-                          (cons i neighbors)
-                          neighbors)))
-      ((= i (num-verts digraph)) neighbors)))
-
-(defun neighbor-closure (digraph)
-  "returns a closure that, given a vertex of digraph, returns a list
-  of its neighbors in digraph"
-  (lambda (vertex)
-    (neighbors digraph vertex)))
