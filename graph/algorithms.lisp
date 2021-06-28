@@ -5,24 +5,24 @@
 
 (in-package :graph-algorithms)
 
-(defun transpose-adjacency-closure (digraph)
+(defun transpose-adjacency-closure (adjacency-fn)
   (lambda (u v)
-    (has-edge digraph v u)))
+    (funcall adjacency-fn v u)))
 
-(defun neighbors (adjacency-fn vertex)
+(defun neighbors (adjacency-fn vertex num-verts)
   "returns the list of vertices adjacent to vertex according to
 adjacency-fn"
   (do ((i 0 (1+ i))
        (neighbors nil (if (funcall adjacency-fn vertex i)
                           (cons i neighbors)
                           neighbors)))
-      ((= i (num-verts digraph)) neighbors)))
+      ((= i num-verts) neighbors)))
 
-(defun neighbor-closure (adjacency-fn)
+(defun neighbor-closure (adjacency-fn num-verts)
   "returns a closure that, given a vertex, returns a list
   of its neighbors according to adjacency-fn"
   (lambda (vertex)
-    (neighbors adjacency-fn vertex)))
+    (neighbors adjacency-fn vertex num-verts)))
 
 (defun depth-first-search (neighbor-fn initial-vertex &key (early-visitor-fn nil) (late-visitor-fn nil))
   "based on the neighbor structure described by neighbor-fn, a
@@ -33,8 +33,8 @@ visitor-fn at the end of each vertex visit"
     (macrolet ((color (vertex)
                  `(gethash ,vertex color-ht :white)))
       (labels ((visit (vertex)
-                 (and early-visitor-fn
-                      (funcall early-visitor-fn vertex))
+                 (when early-visitor-fn
+                   (funcall early-visitor-fn vertex))
                  (setf (color vertex) :gray)
                  (visit-neighbors vertex)
                  (finish-visit vertex))
@@ -44,8 +44,8 @@ visitor-fn at the end of each vertex visit"
                          do (when (eq (color neighbor) :white)
                               (visit neighbor)))))
                (finish-visit (vertex)
-                 (and late-visitor-fn
-                      (funcall late-visitor-fn vertex))
+                 (when late-visitor-fn
+                   (funcall late-visitor-fn vertex))
                  (setf (color vertex) :black)))
         (visit initial-vertex)))))
 
@@ -72,22 +72,40 @@ visitor-fn at the end of each vertex visit"
             (funcall visitor-fn current-vertex)
             (setf (color current-vertex) :black)))))))
 
-(defun strongly-connected-components (neighbor-fn num-verts)
+(defun strongly-connected-components (adjacency-fn num-verts)
   (let ((time 0)
-        (start-time-ht (make-hash-table))
         (finish-time-ht (make-hash-table))
-        (visited-ht (make-hash-table)))
+        (visited-ht (make-hash-table))
+        (predecessor-ht (make-hash-table)))
     (macrolet ((visited (vert)
                  `(gethash ,vert visited-ht :unvisited)))
       (labels ((start-visitor (vert)
                  (setf (visited vert) :visited)
-                 (incf time)
-                 (setf (gethash vert start-time-ht) time))
+                 (incf time))
                (finish-visitor (vert)
                  (incf time)
-                 (setf (gethash vert finish-time-ht) time))))
-      (loop for vert from 0 to (1- num-verts)
-            do (when (eq (visited vert) :unvisited)
-                 (graph-algorithms:depth-first-search neighbor-fn vert
-                                                      :early-visitor-fn #'start-visitor
-                                                      :late-visitor-fn #'finish-visitor))))))
+                 (setf (gethash vert finish-time-ht) time)))
+        (loop for vert from 0 to (1- num-verts)
+              do (when (eq (visited vert) :unvisited)
+                   (depth-first-search (neighbor-closure adjacency-fn num-verts)
+                                       vert
+                                       :early-visitor-fn #'start-visitor
+                                       :late-visitor-fn #'finish-visitor)))
+        (setf visited-ht (make-hash-table))
+        (loop for vert from 0 to (1- num-verts)
+              do (when (eq (visited vert) :unvisited)
+                   (depth-first-search (lambda (v)
+                                         (let ((neighbor (neighbor-closure (transpose-adjacency-closure adjacency-fn)
+                                                                           num-verts)))
+                                           (sort (funcall neighbor v)
+                                                 (lambda (u v)
+                                                   (>= (gethash finish-time-ht u)
+                                                       (gethash finish-time-ht v))))))
+                                       vert
+                                       :early-visitor-fn (let ((last-visited nil))
+                                                           (lambda (vert)
+                                                             (setf (visited vert) :visited)
+                                                             (when last-visited
+                                                               (setf (gethash vert predecessor-ht) last-visited))
+                                                             (setf last-visited vert))))))
+        predecessor-ht))))
