@@ -4,7 +4,8 @@
     :pairs :maptree :map-sexp
     :copy-sexp
     :make-circular
-    :take :drop))
+    :take :drop
+    :put-before-nth-cdr))
 
 (in-package :lists)
 
@@ -61,3 +62,12 @@ circular, this function never returns"
   (if (= n 0)
       list
       (drop (1- n) (cdr list))))
+
+(defun put-before-nth-cdr (list idx elt)
+  (labels ((build (i l)
+             (if (= 0 i)
+                 (cons elt l)
+                 (cons (car l)
+                       (build (1- i)
+                              (cdr l))))))
+    (build idx list)))
