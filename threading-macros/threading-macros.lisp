@@ -29,3 +29,10 @@
                                    (length outer-expr)
                                    expr)
               ,@(cdr exprs)))))
+
+(defmacro as-> (expr name &rest exprs)
+  "clojure style as-> macro"
+  (if (null exprs)
+      expr
+      `(let ((,name ,expr))
+         (as-> ,(car exprs) ,name ,@(cdr exprs)))))
