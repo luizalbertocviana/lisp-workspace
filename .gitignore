@@ -91,3 +91,5 @@
 /future/future.asd~
 /threading-macros/threading-macros.asd~
 /threading-macros/threading-macros.lisp~
+/anaphoric-macros/anaphoric-macros.asd~
+/anaphoric-macros/anaphoric-macros.lisp~
