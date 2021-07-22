@@ -2,13 +2,11 @@
   (:use :common-lisp :lists)
   (:export
      :with-gensyms :with-interned-symbols
-     :pipeline
      :alias :aliases
      :partial
      :for-each
      :compose-predicates
      :not-p :and-p :or-p
-     :aif
      :let-values*))
 
 (in-package :macros)
@@ -25,15 +23,6 @@ for anaphoric macros"
   `(let (,@(loop for symbol in symbols
                  collect `(,symbol (intern (symbol-name ',symbol)))))
      ,@body))
-
-(defmacro pipeline (expr &rest exprs)
-  "anaphoric macro to create a sequence of expressions where it refers
-to the result of the previous expression"
-  (with-interned-symbols (it)
-    (if (null exprs)
-        expr
-        `(let ((,it ,expr))
-           (pipeline ,@exprs)))))
 
 (defmacro alias (new-name old-name)
   "creates an alias to an already defined function or macro"
@@ -96,13 +85,6 @@ and 'not is turned into a proper function call"
                      p
                      `(,p ,x))))
         `(lambda (,x) ,(maptree #'transform expr))))))
-
-(defmacro aif (condition then &optional else)
-  "anaphoric macro that binds condition value to variable it, which
-can be referenced in both then and else expressions"
-  (with-interned-symbols (it)
-    `(let ((,it ,condition))
-       (if ,it ,then ,else))))
 
 (defmacro let-values* (bindings &body body)
   "binding is an expression (var ... values-form). Performs body in a
