@@ -4,7 +4,7 @@
      :with-gensyms :with-interned-symbols
      :pipeline
      :alias :aliases
-     :fn0 :fn1 :fn2 :partial
+     :partial
      :for-each
      :compose-predicates
      :not-p :and-p :or-p
@@ -49,25 +49,6 @@ to the result of the previous expression"
   `(progn ,@(loop for pair in (apply #'pairs args)
                   collect `(alias ,(car pair) ,(cdr pair)))))
 
-(defmacro fn0 (&body body)
-  "macro to create a lambda with no arguments"
-  `(lambda () ,@body))
-
-(defmacro fn1 (&body body)
-  "anaphoric macro to create a lambda with one _ argument"
-  (with-interned-symbols (_)
-    `(lambda (,_) ,@body)))
-
-(defmacro fn2 (&body body)
-  "anaphoric macro to create a lambda with arguments _1 and _2"
-  (with-interned-symbols (_1 _2)
-    `(lambda (,_1 ,_2) ,@body)))
-
-(defmacro fn3 (&body body)
-  "anaphoric macro to create a lambda with arguments _1, _2 and _3"
-  (with-interned-symbols (_1 _2 _3)
-    `(lambda (,_1 ,_2 ,_3) ,@body)))
-
 (defmacro partial (f &rest args)
   "returns a function representing a partial application of f over
 args"
@@ -78,9 +59,10 @@ args"
   "for each expr in exprs, runs body one time, replacing every
 occurrence of var with expr"
   (let* ((bodies (loop for expr in exprs
-                       collect (maptree (fn1 (if (eq _ sym)
-                                                 expr
-                                                 _))
+                       collect (maptree (lambda (e)
+                                          (if (eq e sym)
+                                              expr
+                                              e))
                                         body)))
          (conc-bodies (apply #'nconc bodies)))
     `(progn ,@conc-bodies)))

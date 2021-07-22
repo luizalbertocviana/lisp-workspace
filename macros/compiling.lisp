@@ -50,7 +50,7 @@ declared to be of the associated type"
          (vars       (mapcar #'second type-bindings))
          (vals       (mapcar #'third type-bindings))
          (typed-vars (mapcar #'list types vars))
-         (typed-vals (mapcar (fn2 `(the ,_1 ,_2)) types vals))
+         (typed-vals (mapcar (lambda (tp v) `(the ,tp ,v)) types vals))
          (bindings   (mapcar #'list vars typed-vals)))
     `(let ,bindings
        (with-types ,typed-vars
