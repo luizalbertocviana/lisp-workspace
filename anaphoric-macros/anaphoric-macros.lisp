@@ -18,3 +18,10 @@ can be referenced in both then and else expressions"
   (with-interned-symbols (it)
     `(let ((,it ,condition))
        (if ,it ,then ,else))))
+
+(defmacro alambda (args &body body)
+  "anaphoric macro that returns a lambda which can refer to itself as
+self"
+  (with-interned-symbols (self)
+    `(labels ((,self ,args ,@body))
+       #',self)))
