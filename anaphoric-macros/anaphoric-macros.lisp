@@ -1,5 +1,8 @@
 (defpackage :anaphoric-macros
-  (:use :common-lisp :macros))
+  (:use :common-lisp :macros)
+  (:export
+   :pipeline
+   :aif :alambda))
 
 (in-package :anaphoric-macros)
 
