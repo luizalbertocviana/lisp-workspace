@@ -63,3 +63,26 @@
                                            expr)
                       ,expr)
                   ,@other-forms))))
+
+(defmacro some-> (expr &rest forms)
+  "clojure style some-> macro"
+  (if (null forms)
+      expr
+      (with-gensyms (test)
+        `(some-> (when-let (,test ,expr)
+                   ,(put-before-nth-cdr (car forms)
+                                        1
+                                        test))
+                 ,@(cdr forms)))))
+
+(defmacro some->> (expr &rest forms)
+  "clojure style some->> macro"
+  (if (null forms)
+      expr
+      (destructuring-bind (form &rest other-forms) forms
+        (with-gensyms (test)
+          `(some->> (when-let (,test ,expr)
+                      ,(put-before-nth-cdr form
+                                           (length form)
+                                           test))
+                    ,@other-forms)))))
