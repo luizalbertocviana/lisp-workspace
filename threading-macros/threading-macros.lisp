@@ -1,6 +1,5 @@
 (defpackage threading-macros
-  (:use :common-lisp
-   :lists)
+  (:use :common-lisp :lists :macros :anaphoric-macros)
   (:export
    :-> :->>))
 
