@@ -97,3 +97,5 @@
 /specializing/specializing.lisp~
 /array-macros/array-macros.asd~
 /array-macros/array-macros.lisp~
+/anaphoric-macros/anaphoric-macros-tests.lisp~
+/anaphoric-macros/anaphoric-macros-tests.asd~
