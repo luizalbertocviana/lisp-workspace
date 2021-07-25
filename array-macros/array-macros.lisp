@@ -1,8 +1,8 @@
-(defpackage :array
+(defpackage :array-macros
   (:use :common-lisp :macros)
   (:export :traversal))
 
-(in-package :array)
+(in-package :array-macros)
 
 (defun build-static-traversal-code (arr n body &key (unroll 1))
   "returns the code necessary to run body on each of the n first
