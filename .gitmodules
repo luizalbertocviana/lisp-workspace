@@ -4,3 +4,6 @@
 [submodule "asdf-flv"]
 	path = asdf-flv
 	url = https://github.com/luizalbertocviana/asdf-flv
+[submodule "fiveam"]
+	path = fiveam
+	url = https://github.com/luizalbertocviana/fiveam
