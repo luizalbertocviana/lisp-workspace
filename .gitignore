@@ -93,3 +93,5 @@
 /threading-macros/threading-macros.lisp~
 /anaphoric-macros/anaphoric-macros.asd~
 /anaphoric-macros/anaphoric-macros.lisp~
+/specializing/specializing.asd~
+/specializing/specializing.lisp~
