@@ -1,8 +1,8 @@
-(defpackage :spec
+(defpackage :specializing
   (:use :common-lisp)
-  (:export :defun-tag))
+  (:export :defun-spec))
 
-(in-package :spec)
+(in-package :specializing)
 
 (defparameter +agressive-optimize-tuple+
   '(optimize (speed             3)
@@ -112,21 +112,13 @@ according to typed-vars, typed-locals and return-type"
                   ,@(create-type-tuples typed-vars))
        (the ,return-type (progn ,@modified-body)))))
 
-(defun treat-spec (spec body)
-  "creates a cond clause responsible for the execution of an optimized
-version of body built according to spec"
-  (destructuring-bind (return-type typed-vars &key (locals nil)) spec
-    `((and ,@(loop for (type var) in typed-vars
-                   collect `(typep ,var ',type)))
-      ,(create-optimized-body body return-type typed-vars locals))))
-
 (defun treat-tagged-spec (tagged-spec body)
   "creates a case clause responsible for the execution of an optimized
 version of body built according to tagged-spec"
   (destructuring-bind (tag (return-type typed-vars &key (locals nil))) tagged-spec
     `(,tag ,(create-optimized-body body return-type typed-vars locals))))
 
-(defmacro defun-tag (name lambda-list (&rest tagged-specs) &body body)
+(defmacro defun-spec (name lambda-list (&rest tagged-specs) &body body)
   "defines a function named name with lambda-list as signature. An
 additional &key argument (tag :default) is providded. Each tagged-spec
 has the form (tag (return-type ((type sig-var) ...)  :locals ((type

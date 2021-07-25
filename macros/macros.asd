@@ -5,5 +5,4 @@
   :components ((:file "macros")
                (:file "aliases" :depends-on ("macros"))
                (:file "compiling" :depends-on ("macros"))
-               (:file "spec")
                (:file "array" :depends-on ("macros"))))
