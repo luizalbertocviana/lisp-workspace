@@ -3,5 +3,4 @@
   :author "Luiz Alberto do Carmo Viana <luizalbertocviana@gmail.com>"
   :depends-on (:functions)
   :components ((:file "macros")
-               (:file "compiling" :depends-on ("macros"))
                (:file "array" :depends-on ("macros"))))
