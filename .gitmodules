@@ -1,3 +1,6 @@
 [submodule "alexandria"]
 	path = alexandria
 	url = https://github.com/luizalbertocviana/alexandria
+[submodule "asdf-flv"]
+	path = asdf-flv
+	url = https://github.com/luizalbertocviana/asdf-flv
