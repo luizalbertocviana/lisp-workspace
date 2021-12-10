@@ -25,6 +25,15 @@ transformed by f"
          (let ((first (car tree)) (second (cdr tree)))
            (cons (maptree f first) (maptree f second))))))
 
+(defun replace-atom (tree atom thing &key (eq-test #'eq))
+  "returns a copy of tree in which every occurrence of atom is
+replaced by thing"
+  (maptree (lambda (x)
+             (if (funcall eq-test atom x)
+                 thing
+                 x))
+           tree))
+
 (defun map-sexp (f sexp &key (copy nil))
   "returns a sexp whose sub-expressions (including sexp) are modified by f"
   (let ((modified (funcall f sexp)))
