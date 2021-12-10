@@ -34,6 +34,19 @@ replaced by thing"
                  x))
            tree))
 
+(defun remove-atom (tree atom &key (eq-test #'eq))
+  "returns a copy of tree in which there are no occurrences of atom"
+  (cond ((null tree) nil)
+        ((atom tree) (if (funcall eq-test tree atom)
+                         nil
+                         tree))
+        ((consp tree)
+         (let ((filt-car (remove-atom (car tree) atom :eq-test eq-test))
+               (filt-cdr (remove-atom (cdr tree) atom :eq-test eq-test)))
+           (if (null filt-car)
+               filt-cdr
+               (cons filt-car filt-cdr))))))
+
 (defun map-sexp (f sexp &key (copy nil))
   "returns a sexp whose sub-expressions (including sexp) are modified by f"
   (let ((modified (funcall f sexp)))
