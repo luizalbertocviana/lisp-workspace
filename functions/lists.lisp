@@ -2,6 +2,7 @@
   (:use :common-lisp)
   (:export
     :pairs :maptree :map-sexp
+    :replace-atom :remove-atom
     :copy-sexp
     :make-circular
     :take :drop
