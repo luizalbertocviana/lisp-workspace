@@ -10,7 +10,7 @@
 (in-package :digraph)
 
 (defstruct digraph
-  "representes a directed graph"
+  "represents a directed graph"
   (num-verts 0 :type fixnum)
   (num-edges 0 :type fixnum)
   (adj #(0) :type (simple-array bit)))
