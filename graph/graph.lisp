@@ -6,7 +6,7 @@
 (in-package :graph)
 
 (defstruct graph
-  "representes an undirected graph"
+  "represents an undirected graph"
   (digraph nil :type digraph:digraph))
 
 (defun empty (num-verts)
